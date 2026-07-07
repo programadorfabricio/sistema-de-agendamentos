@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navalha & Ofício — Agendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #17140F;
+    --bg-outer: #0E0C09;
+    --card: #211C15;
+    --card-alt: #2A231A;
+    --ivory: #EDE6D6;
+    --ivory-dim: #ACA290;
+    --brass: #C79A54;
+    --brass-soft: rgba(199,154,84,0.16);
+    --green: #7FB88A;
+    --oxblood: #8A3A34;
+    --error: #E2857A;
+    --line: rgba(237,230,214,0.12);
+    --line-strong: rgba(237,230,214,0.24);
+    --radius: 3px;
+  }
+  :root[data-theme="light"]{
+    --bg: #FBF7EF;
+    --bg-outer: #ECE2D0;
+    --card: #FFFFFF;
+    --card-alt: #F4EEDF;
+    --ivory: #241C13;
+    --ivory-dim: #655B4C;
+    --brass: #8C5F27;
+    --brass-soft: rgba(140,95,39,0.14);
+    --green: #2F7A46;
+    --error: #B23B2E;
+    --line: rgba(36,28,19,0.12);
+    --line-strong: rgba(36,28,19,0.24);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  *, *::before, *::after{ transition:background-color .22s ease, border-color .22s ease, color .22s ease; }
+  html,body{ height:100%; }
+  body{
+    margin:0; background:var(--bg-outer); color:var(--ivory);
+    font-family:'Public Sans', sans-serif; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  button, input{ font-family:inherit; }
+  button{ cursor:pointer; }
+  :focus-visible{ outline:2px solid var(--brass); outline-offset:2px; }
+
+  .app-shell{
+    max-width:460px; margin:0 auto; min-height:100dvh;
+    background:var(--bg); display:flex; flex-direction:column; position:relative;
+  }
+  @media (min-width:461px){ .app-shell{ box-shadow:0 0 80px rgba(0,0,0,0.55); } }
+
+  /* ---------- Cover / header ---------- */
+  .cover{
+    position:relative; padding:0 16px 0;
+    background:var(--bg);
+  }
+  .cover-photo{
+    position:relative; height:132px; margin:0 -16px; padding:16px;
+    background-size:cover; background-position:center;
+    display:flex; flex-direction:column;
+  }
+  .cover-photo::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(14,12,9,0.35) 0%, rgba(14,12,9,0.15) 45%, var(--bg) 100%);
+    pointer-events:none;
+  }
+  .cover-top{ display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; }
+  .icon-btn{
+    width:36px; height:36px; border-radius:50%; background:var(--card-alt);
+    border:1px solid var(--line-strong); color:var(--ivory);
+    display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;
+    transition:transform .15s ease, background-color .2s ease;
+  }
+  .icon-btn:active{ transform:scale(0.9); }
+  .icon-btn-group{ display:flex; gap:8px; }
+
+  .brand-badge{
+    position:relative; z-index:1;
+    width:104px; height:104px; margin:-52px auto 12px; border-radius:50%;
+    border:1.5px solid var(--brass); display:flex; align-items:center; justify-content:center;
+    background:var(--card); box-shadow:0 4px 18px rgba(0,0,0,0.35);
+  }
+  .brand-badge span{ font-family:'Fraunces', serif; font-weight:700; font-size:1.6rem; color:var(--brass); letter-spacing:0.02em; }
+
+  .biz-name{ text-align:center; font-family:'Fraunces', serif; font-weight:700; font-size:1.15rem; }
+  .biz-address{ text-align:center; color:var(--ivory-dim); font-size:0.8rem; margin-top:4px; padding:0 12px 18px; }
+
+  /* ---------- Tabs ---------- */
+  .tabs{
+    display:flex; gap:4px; overflow-x:auto; border-bottom:1px solid var(--line);
+    padding:0 12px; scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab-btn{
+    flex:0 0 auto; background:none; border:none; color:var(--ivory-dim);
+    font-size:0.78rem; font-weight:600; letter-spacing:0.03em; text-transform:uppercase;
+    padding:14px 10px; position:relative;
+  }
+  .tab-btn.active{ color:var(--ivory); }
+  .tab-btn.active::after{
+    content:''; position:absolute; left:10px; right:10px; bottom:-1px; height:2px; background:var(--brass);
+  }
+
+  /* ---------- Panels ---------- */
+  main.panels{ flex:1; overflow-y:auto; }
+  .panel{ display:none; padding:16px 16px 28px; }
+  .panel.active{ display:block; animation:panelFadeIn .3s ease; }
+  @keyframes panelFadeIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
+
+  .search-box{
+    display:flex; align-items:center; gap:10px;
+    background:var(--card); border:1px solid var(--line-strong); border-radius:var(--radius);
+    padding:11px 14px; margin-bottom:16px;
+  }
+  .search-box svg{ flex-shrink:0; opacity:0.6; }
+  .search-box input{
+    border:none; background:none; color:var(--ivory); font-size:0.9rem; width:100%; outline:none;
+  }
+  .search-box input::placeholder{ color:var(--ivory-dim); }
+
+  .cat-label{ font-family:'JetBrains Mono', monospace; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ivory-dim); margin-bottom:10px; }
+  .cat-scroller{ display:flex; gap:8px; overflow-x:auto; padding-bottom:16px; scrollbar-width:none; }
+  .cat-scroller::-webkit-scrollbar{ display:none; }
+  .cat-chip{
+    flex:0 0 auto; background:var(--card); border:1px solid var(--line-strong); border-radius:20px;
+    color:var(--ivory-dim); font-size:0.78rem; font-weight:600; padding:9px 16px;
+  }
+  .cat-chip.active{ background:var(--brass-soft); border-color:var(--brass); color:var(--brass); }
+
+  .service-row{
+    display:flex; align-items:flex-start; gap:12px;
+    padding:14px 0; border-bottom:1px solid var(--line);
+  }
+  .service-row:last-child{ border-bottom:none; }
+  .svc-icon{
+    width:42px; height:42px; border-radius:50%; background:var(--brass);
+    display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0; color:#1A150D;
+  }
+  .svc-info{ flex:1; min-width:0; }
+  .svc-name{ font-weight:600; font-size:0.94rem; }
+  .svc-desc{ font-size:0.79rem; color:var(--ivory-dim); margin-top:2px; }
+  .svc-meta{ display:flex; align-items:center; gap:14px; margin-top:8px; font-family:'JetBrains Mono', monospace; font-size:0.78rem; }
+  .svc-price{ color:var(--green); font-weight:600; }
+  .svc-duration{ color:var(--ivory-dim); display:flex; align-items:center; gap:4px; }
+  .svc-agendar{
+    flex-shrink:0; align-self:center;
+    background:var(--ivory); color:#1A150D; border:none; border-radius:var(--radius);
+    font-size:0.8rem; font-weight:700; padding:9px 16px;
+  }
+  .empty-state{ text-align:center; padding:40px 10px; color:var(--ivory-dim); font-size:0.88rem; }
+
+  .svc-select{
+    width:20px; height:20px; margin-top:11px; border-radius:50%; flex-shrink:0;
+    border:1.5px solid var(--line-strong); background:none; position:relative;
+  }
+  .svc-select.selected{ background:var(--brass); border-color:var(--brass); }
+  .svc-select.selected::after{
+    content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:0.62rem; font-weight:700; color:#1A150D;
+  }
+  .svc-actions{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0; }
+  .svc-fav{ background:none; border:none; color:var(--ivory-dim); font-size:1.15rem; padding:0 2px; line-height:1; }
+  .svc-fav.active{ color:var(--error); }
+
+  .multi-select-bar{
+    position:fixed; left:50%; bottom:0; transform:translate(-50%, 100%);
+    width:100%; max-width:460px; z-index:15;
+    background:var(--card); border-top:1px solid var(--line-strong);
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    box-shadow:0 -6px 20px rgba(0,0,0,0.3);
+  }
+  .multi-select-bar.visible{ transform:translate(-50%, 0); transition:transform .28s ease; }
+  .msb-info{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .msb-info strong{ font-size:0.86rem; }
+  .msb-info span{ font-size:0.76rem; color:var(--ivory-dim); font-family:'JetBrains Mono', monospace; white-space:nowrap; }
+  #msbContinueBtn{ width:auto; flex-shrink:0; padding:11px 18px; font-size:0.82rem; }
+
+  /* ---------- Skeleton loading ---------- */
+  .skeleton{
+    background:linear-gradient(90deg, var(--card) 25%, var(--card-alt) 37%, var(--card) 63%);
+    background-size:400% 100%; animation:skeleton-loading 1.4s ease infinite;
+  }
+  @keyframes skeleton-loading{ 0%{ background-position:100% 50%; } 100%{ background-position:0 50%; } }
+  .skel-avatar{ width:42px; height:42px; border-radius:50%; flex-shrink:0; }
+  .skel-line{ height:11px; border-radius:4px; }
+  .skel-line.short{ width:35%; }
+  .skel-line.medium{ width:65%; }
+  .skel-line.long{ width:92%; }
+  @media (prefers-reduced-motion: reduce){
+    .skeleton{ animation:none; background:var(--card-alt); }
+  }
+
+  /* ---------- Profissionais / Detalhes / etc ---------- */
+  .pro-row{
+    display:flex; align-items:center; gap:14px;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:12px; margin-bottom:12px;
+  }
+  .pro-row img{ width:52px; height:52px; border-radius:50%; object-fit:cover; filter:grayscale(45%); }
+  .pro-row .name{ font-weight:600; font-size:0.94rem; }
+  .pro-row .role{ font-size:0.79rem; color:var(--ivory-dim); margin-top:1px; }
+
+  .info-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px; margin-bottom:12px;
+  }
+  .info-card .row{ display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+  .info-card .row:last-child{ border-bottom:none; }
+  .info-card .row span:first-child{ color:var(--ivory-dim); }
+  .info-card .row span:last-child{ font-family:'JetBrains Mono', monospace; }
+
+  .loyalty-card{
+    background:var(--card); border:1px solid var(--brass); border-radius:var(--radius); padding:20px;
+  }
+  .loyalty-card h3{ font-family:'Fraunces', serif; font-size:1.1rem; margin:0 0 6px; }
+  .loyalty-card p{ color:var(--ivory-dim); font-size:0.85rem; margin:0 0 16px; }
+  .loyalty-bar{ height:8px; background:var(--line); border-radius:20px; overflow:hidden; margin-bottom:8px; }
+  .loyalty-fill{ height:100%; background:var(--brass); width:60%; }
+  .loyalty-count{ font-family:'JetBrains Mono', monospace; font-size:0.78rem; color:var(--brass); }
+
+  /* ---------- Booking sheet ---------- */
+  .sheet-overlay{
+    position:fixed; top:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:460px; height:100dvh;
+    background:rgba(0,0,0,0.55);
+    display:none; align-items:flex-end; z-index:20;
+  }
+  .sheet-overlay.open{ display:flex; }
+  .sheet{
+    width:100%; max-height:88%; background:var(--bg);
+    border-radius:16px 16px 0 0; border-top:1px solid var(--line-strong);
+    display:flex; flex-direction:column; transform:translateY(100%);
+    transition:transform .3s ease;
+  }
+  .sheet-overlay.open .sheet{ transform:translateY(0); }
+  .sheet-handle{ width:36px; height:4px; background:var(--line-strong); border-radius:4px; margin:10px auto 0; flex-shrink:0; }
+  .sheet-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--line); flex-shrink:0; }
+  .sheet-head .title{ font-family:'Fraunces', serif; font-weight:700; font-size:1rem; }
+  .sheet-head .sub{ font-family:'JetBrains Mono', monospace; font-size:0.7rem; color:var(--brass); margin-top:2px; }
+  .sheet-close{ width:30px; height:30px; border-radius:50%; background:var(--card-alt); border:1px solid var(--line-strong); color:var(--ivory); font-size:1rem; }
+  .sheet-progress{ height:3px; background:var(--line); flex-shrink:0; }
+  .sheet-progress-fill{ height:100%; background:var(--brass); transition:width .35s ease; }
+  .sheet-body{ flex:1; overflow-y:auto; padding:18px 18px 22px; }
+  .sheet-foot{ padding:14px 18px calc(14px + env(safe-area-inset-bottom)); border-top:1px solid var(--line); flex-shrink:0; }
+
+  .step-heading h2{ font-family:'Fraunces', serif; font-size:1.2rem; margin:0 0 4px; }
+  .step-heading p{ margin:0 0 18px; color:var(--ivory-dim); font-size:0.85rem; }
+
+  .barber-list{ display:flex; flex-direction:column; gap:10px; }
+  .barber-select-row{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:11px;
+  }
+  .barber-select-row img{ width:48px; height:48px; border-radius:50%; object-fit:cover; filter:grayscale(45%); }
+  .barber-select-row.selected{ border-color:var(--brass); background:var(--card-alt); }
+  .barber-select-row .name{ font-weight:600; font-size:0.9rem; }
+  .barber-select-row .role{ font-size:0.76rem; color:var(--ivory-dim); }
+  .barber-select-row .check{ margin-left:auto; width:20px; height:20px; border-radius:50%; border:1.5px solid var(--line-strong); display:flex; align-items:center; justify-content:center; font-size:0.72rem; color:transparent; }
+  .barber-select-row.selected .check{ background:var(--brass); border-color:var(--brass); color:#1A150D; }
+
+  .date-scroller{ display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-bottom:20px; scrollbar-width:none; }
+  .date-scroller::-webkit-scrollbar{ display:none; }
+  .date-chip{ flex:0 0 auto; min-width:52px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); color:var(--ivory-dim); padding:9px 4px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:0.7rem; }
+  .date-chip .dow{ display:block; text-transform:uppercase; }
+  .date-chip .num{ display:block; margin-top:3px; font-size:0.92rem; color:var(--ivory); font-family:'Public Sans',sans-serif; font-weight:600; }
+  .date-chip.active{ border-color:var(--brass); background:var(--brass-soft); color:var(--brass); }
+  .date-chip.active .num{ color:var(--brass); }
+
+  .month-nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .month-nav .month-label{ font-family:'Fraunces', serif; font-weight:700; font-size:0.95rem; text-transform:capitalize; }
+  .month-nav-btn{ width:32px; height:32px; border-radius:50%; background:var(--card); border:1px solid var(--line-strong); color:var(--ivory); display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
+  .month-nav-btn:disabled{ opacity:0.3; cursor:not-allowed; }
+
+  .calendar-dow{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:6px; }
+  .calendar-dow span{ text-align:center; font-family:'JetBrains Mono', monospace; font-size:0.62rem; letter-spacing:0.06em; color:var(--ivory-dim); text-transform:uppercase; }
+  .calendar-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:18px; }
+  .day-cell{ aspect-ratio:1; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); color:var(--ivory); font-size:0.82rem; display:flex; align-items:center; justify-content:center; }
+  .day-cell.empty{ background:none; border:none; }
+  .day-cell:disabled{ color:rgba(172,162,144,0.3); background:none; border-color:rgba(237,230,214,0.06); }
+  .day-cell.today:not(.selected){ border-color:var(--line-strong); color:var(--brass); }
+  .day-cell.selected{ background:var(--brass); border-color:var(--brass); color:#1A150D; font-weight:700; }
+
+  .whatsapp-btn{ background:var(--green); color:#122016; margin-top:10px; }
+
+  /* ---------- Avaliações ---------- */
+  .reviews-summary{
+    display:flex; align-items:center; gap:18px;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; margin-bottom:16px;
+  }
+  .rating-big{ font-family:'Fraunces', serif; font-weight:700; font-size:2.2rem; color:var(--brass); line-height:1; flex-shrink:0; }
+  .rating-side{ flex:1; min-width:0; }
+  .rating-stars{ color:var(--brass); font-size:0.95rem; letter-spacing:1px; }
+  .rating-stars .empty{ color:rgba(237,230,214,0.2); }
+  .rating-count{ font-size:0.78rem; color:var(--ivory-dim); margin-top:3px; }
+
+  .review-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px; margin-bottom:12px;
+  }
+  .review-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .review-avatar{
+    width:38px; height:38px; border-radius:50%; background:var(--brass-soft); color:var(--brass);
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0;
+  }
+  .review-name{ font-weight:600; font-size:0.88rem; }
+  .review-meta{ font-size:0.74rem; color:var(--ivory-dim); margin-top:1px; }
+  .review-stars{ margin-left:auto; color:var(--brass); font-size:0.8rem; flex-shrink:0; }
+  .review-stars .empty{ color:rgba(237,230,214,0.2); }
+  .review-text{ font-size:0.86rem; color:var(--ivory); margin:0 0 10px; line-height:1.5; }
+  .review-photos{ display:flex; gap:8px; }
+  .review-photos img{ width:64px; height:64px; border-radius:var(--radius); object-fit:cover; }
+
+  .star-picker{ display:flex; gap:8px; justify-content:center; margin-bottom:20px; }
+  .star-picker button{ background:none; border:none; font-size:1.9rem; color:rgba(237,230,214,0.25); line-height:1; padding:4px; }
+  .star-picker button.active{ color:var(--brass); }
+  textarea.review-textarea{
+    width:100%; background:var(--card-alt); border:1px solid var(--line-strong); border-radius:var(--radius);
+    color:var(--ivory); padding:11px 12px; font-size:0.9rem; font-family:inherit; resize:vertical; min-height:90px;
+  }
+
+  .period-title{ font-family:'JetBrains Mono', monospace; font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--ivory-dim); margin-bottom:9px; }
+  .period-block{ margin-bottom:18px; }
+  .time-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .time-slot{ font-family:'JetBrains Mono', monospace; font-size:0.83rem; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); color:var(--ivory); padding:11px 4px; text-align:center; }
+  .time-slot.selected{ background:var(--brass); border-color:var(--brass); color:#1A150D; font-weight:600; }
+  .time-slot:disabled{ color:rgba(172,162,144,0.35); text-decoration:line-through; border-color:rgba(237,230,214,0.06); }
+
+  .summary-card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; margin-bottom:18px; }
+  .summary-card .row{ display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+  .summary-card .row:last-child{ border-bottom:none; }
+  .summary-card .row img{ width:34px; height:34px; border-radius:50%; object-fit:cover; filter:grayscale(45%); }
+  .summary-card .row .label{ color:var(--ivory-dim); width:70px; flex-shrink:0; font-size:0.76rem; }
+  .summary-card .row .val{ font-family:'JetBrains Mono', monospace; color:var(--brass); }
+
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:0.77rem; color:var(--ivory-dim); margin-bottom:6px; }
+  .field input{ width:100%; background:var(--card-alt); border:1px solid var(--line-strong); border-radius:var(--radius); color:var(--ivory); padding:11px 12px; font-size:0.92rem; }
+  .field input.error, .field textarea.error{ border-color:var(--error); border-width:1.5px; }
+  .field-error{ display:flex; align-items:flex-start; gap:5px; color:var(--error); font-size:0.78rem; margin:6px 0 0; line-height:1.4; }
+
+  /* ---------- Localização / mapa / ações ---------- */
+  .map-card{
+    border-radius:var(--radius); overflow:hidden; border:1px solid var(--line-strong);
+    margin-bottom:12px; height:150px;
+  }
+  .gallery-scroller{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:20px; scrollbar-width:none; }
+  .gallery-scroller::-webkit-scrollbar{ display:none; }
+  .gallery-scroller img{ width:120px; height:90px; object-fit:cover; border-radius:var(--radius); flex-shrink:0; border:1px solid var(--line); }
+  .map-card iframe{ width:100%; height:100%; border:0; display:block; filter:grayscale(35%) contrast(1.05) brightness(0.92); }
+  .action-row{ display:flex; gap:10px; margin-bottom:22px; }
+  .action-row .link-btn{
+    flex:1; background:var(--card); border:1px solid var(--line-strong); color:var(--ivory);
+    font-size:0.82rem; font-weight:600; padding:11px 8px; text-decoration:none;
+  }
+  .action-row .link-btn.instagram-btn{ color:var(--brass); border-color:var(--brass); background:var(--brass-soft); }
+  .policy-card p{ margin:0 0 10px; font-size:0.85rem; color:var(--ivory-dim); line-height:1.55; }
+  .policy-card p:last-child{ margin-bottom:0; }
+  .policy-card strong{ color:var(--ivory); }
+
+  /* ---------- Login ---------- */
+  .icon-btn.logged-in{ background:var(--brass); border-color:var(--brass); color:#1A150D; font-weight:700; font-size:0.72rem; }
+  .login-options{ display:flex; flex-direction:column; gap:10px; }
+  .login-option-btn{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:13px 14px; color:var(--ivory); font-size:0.9rem; font-weight:600;
+  }
+  .provider-icon{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.95rem; font-weight:700; flex-shrink:0; }
+  .provider-icon.google{ background:#EDE6D6; color:#4285F4; }
+  .provider-icon.apple{ background:#111; color:#fff; }
+  .provider-icon.whatsapp{ background:var(--green); color:#122016; }
+  .provider-icon.telefone{ background:var(--card-alt); color:var(--brass); border:1px solid var(--line-strong); }
+  .login-disclaimer{ font-size:0.74rem; color:var(--ivory-dim); text-align:center; margin-top:16px; line-height:1.5; }
+  .login-back{ background:none; border:none; color:var(--ivory-dim); font-size:0.82rem; margin-bottom:14px; padding:0; }
+  .code-input{ letter-spacing:0.5em; text-align:center; font-family:'JetBrains Mono', monospace; font-size:1.1rem; }
+  .account-actions{ margin-top:6px; }
+
+  /* ---------- Perfil do cliente ---------- */
+  .profile-head{ display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+  .profile-photo{ width:64px; height:64px; border-radius:50%; object-fit:cover; border:1.5px solid var(--brass); flex-shrink:0; }
+  .profile-name{ font-family:'Fraunces', serif; font-weight:700; font-size:1.05rem; }
+  .profile-sub{ font-size:0.8rem; color:var(--ivory-dim); margin-top:2px; }
+  .profile-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+  .profile-stat{
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:3px;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:12px 6px;
+  }
+  .profile-stat .v{ font-family:'JetBrains Mono', monospace; font-weight:700; font-size:0.86rem; color:var(--brass); }
+  .profile-stat .l{ font-size:0.68rem; color:var(--ivory-dim); }
+  .pref-chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+  .history-list{ margin-bottom:6px; }
+  .history-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:11px 0; border-bottom:1px solid var(--line);
+  }
+  .history-row:last-child{ border-bottom:none; }
+  .history-service{ font-weight:600; font-size:0.86rem; }
+  .history-meta{ font-size:0.76rem; color:var(--ivory-dim); margin-top:1px; }
+  .history-price{ font-family:'JetBrains Mono', monospace; color:var(--green); font-weight:600; font-size:0.85rem; flex-shrink:0; }
+
+  .staff-demo-link{
+    display:block; width:100%; background:none; border:1px dashed var(--line-strong); border-radius:var(--radius);
+    color:var(--ivory-dim); font-size:0.78rem; padding:10px; margin-top:4px; text-align:center;
+  }
+  .staff-client-row{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:12px; margin-bottom:10px; color:var(--ivory);
+  }
+  .staff-client-row .avatar{
+    width:40px; height:40px; border-radius:50%; background:var(--brass-soft); color:var(--brass);
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0;
+  }
+  .staff-client-row .name{ font-weight:600; font-size:0.9rem; }
+  .staff-client-row .meta{ font-size:0.76rem; color:var(--ivory-dim); margin-top:1px; }
+  .staff-notes-textarea{
+    width:100%; background:var(--card-alt); border:1px solid var(--line-strong); border-radius:var(--radius);
+    color:var(--ivory); padding:11px 12px; font-size:0.86rem; font-family:inherit; resize:vertical; min-height:90px;
+  }
+
+  .staff-dashboard{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
+  .dash-stat{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:12px; display:flex; flex-direction:column; gap:3px;
+  }
+  .dash-stat .v{ font-family:'JetBrains Mono', monospace; font-weight:700; font-size:1.05rem; color:var(--brass); line-height:1.15; }
+  .dash-stat .l{ font-size:0.7rem; color:var(--ivory-dim); }
+
+  .quick-notes{ display:flex; flex-direction:column; gap:2px; margin-bottom:14px; }
+  .quick-note-item{
+    display:flex; align-items:center; gap:10px; padding:9px 4px; font-size:0.85rem; cursor:pointer;
+    border-bottom:1px solid var(--line);
+  }
+  .quick-note-item:last-child{ border-bottom:none; }
+  .quick-note-item input[type="checkbox"]{
+    width:18px; height:18px; flex-shrink:0; accent-color:var(--brass); cursor:pointer;
+  }
+
+  .demo-badge{
+    display:flex; align-items:center; gap:8px; margin:0 16px 12px; padding:8px 10px;
+    background:var(--brass-soft); border:1px solid var(--brass); border-radius:var(--radius);
+    flex-shrink:0;
+  }
+  .demo-badge .dot{
+    width:7px; height:7px; border-radius:50%; background:var(--brass); flex-shrink:0;
+    animation:demo-pulse 1.8s ease infinite;
+  }
+  @keyframes demo-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.35; } }
+  .demo-badge div{ display:flex; flex-direction:column; line-height:1.25; }
+  .demo-badge strong{ font-size:0.76rem; color:var(--brass); }
+  .demo-badge span{ font-size:0.68rem; color:var(--ivory-dim); }
+
+  .success{ text-align:center; padding:10px 4px; }
+  .success .mark{ width:58px; height:58px; margin:0 auto 16px; border-radius:50%; border:1.5px solid var(--brass); display:flex; align-items:center; justify-content:center; color:var(--brass); font-size:1.5rem; }
+  .success h2{ font-family:'Fraunces', serif; font-size:1.2rem; margin-bottom:6px; }
+  .success p{ color:var(--ivory-dim); font-size:0.86rem; margin-bottom:18px; }
+
+  .btn{ width:100%; padding:14px; border-radius:var(--radius); font-size:0.94rem; font-weight:600; border:none; display:flex; align-items:center; justify-content:center; gap:8px; }
+
+  .tab-btn, .cat-chip, .svc-agendar, .btn, .day-cell, .time-slot, .barber-select-row, .login-option-btn, .link-btn{
+    transition:transform .12s ease, background-color .2s ease, border-color .2s ease, color .2s ease;
+  }
+  .tab-btn:active, .cat-chip:active, .svc-agendar:active, .btn:not(:disabled):active, .day-cell:not(:disabled):active,
+  .time-slot:not(:disabled):active, .barber-select-row:active, .login-option-btn:active, .link-btn:active{
+    transform:scale(0.96);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration:0.001ms !important; animation-iteration-count:1 !important;
+      transition-duration:0.001ms !important; scroll-behavior:auto !important;
+    }
+  }
+  .btn-primary{ background:var(--brass); color:#1A150D; }
+  .btn-primary:disabled{ background:var(--card-alt); color:var(--ivory-dim); cursor:not-allowed; }
+  .back-inline{ background:none; border:none; color:var(--ivory-dim); font-size:0.82rem; margin-bottom:14px; padding:0; display:flex; align-items:center; gap:4px; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <div class="cover">
+    <div class="cover-photo" style="background-image:url('https://picsum.photos/seed/barbershop-interior/800/500');">
+      <div class="cover-top">
+        <button class="icon-btn" aria-label="Voltar">‹</button>
+        <div class="icon-btn-group">
+          <button class="icon-btn" id="themeToggleBtn" aria-label="Alternar tema claro/escuro">🌙</button>
+          <button class="icon-btn" id="shareBtn" aria-label="Compartilhar barbearia">📤</button>
+          <button class="icon-btn" id="profileBtn" aria-label="Entrar">👤</button>
+          <button class="icon-btn" aria-label="Notificações">🔔</button>
+          <button class="icon-btn" aria-label="Favoritar">♡</button>
+        </div>
+      </div>
+    </div>
+    <div class="brand-badge"><span>N·O</span></div>
+    <div class="biz-name">Navalha & Ofício — Centro Paulínia</div>
+    <div class="biz-address">Rua das Tesouras, 128 · Centro, Paulínia/SP</div>
+  </div>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Seções da barbearia">
+    <button class="tab-btn active" data-tab="servicos" role="tab" aria-selected="true" aria-controls="panel-servicos" id="tab-servicos">Serviços</button>
+    <button class="tab-btn" data-tab="detalhes" role="tab" aria-selected="false" aria-controls="panel-detalhes" id="tab-detalhes" tabindex="-1">Detalhes</button>
+    <button class="tab-btn" data-tab="profissionais" role="tab" aria-selected="false" aria-controls="panel-profissionais" id="tab-profissionais" tabindex="-1">Profissionais</button>
+    <button class="tab-btn" data-tab="avaliacoes" role="tab" aria-selected="false" aria-controls="panel-avaliacoes" id="tab-avaliacoes" tabindex="-1">Avaliações</button>
+    <button class="tab-btn" data-tab="fidelidade" role="tab" aria-selected="false" aria-controls="panel-fidelidade" id="tab-fidelidade" tabindex="-1">Fidelidade</button>
+  </nav>
+
+  <main class="panels" id="panels">
+
+    <div class="panel active" id="panel-servicos" role="tabpanel" aria-labelledby="tab-servicos">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input type="text" id="searchInput" placeholder="Pesquisar serviço..." aria-label="Pesquisar serviço">
+      </div>
+      <div class="cat-label">Categorias</div>
+      <div class="cat-scroller" id="catScroller"></div>
+      <div id="serviceList"></div>
+    </div>
+
+    <div class="panel" id="panel-detalhes" role="tabpanel" aria-labelledby="tab-detalhes">
+      <div class="cat-label">Fotos do espaço</div>
+      <div class="gallery-scroller">
+        <img src="https://picsum.photos/seed/barbershop-chairs/300/300" alt="Cadeiras e balcão da barbearia" loading="lazy">
+        <img src="https://picsum.photos/seed/barbershop-tools/300/300" alt="Ferramentas de corte e navalhas" loading="lazy">
+        <img src="https://picsum.photos/seed/barbershop-front/300/300" alt="Fachada da barbearia" loading="lazy">
+        <img src="https://picsum.photos/seed/barbershop-wait/300/300" alt="Área de espera" loading="lazy">
+      </div>
+
+      <div class="cat-label">Localização</div>
+      <div class="map-card">
+        <iframe src="https://www.google.com/maps?q=Rua+das+Tesouras,+128+-+Centro,+Paulínia+-+SP&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa da Navalha & Ofício"></iframe>
+      </div>
+      <div class="action-row">
+        <a class="btn link-btn" href="https://www.google.com/maps/dir/?api=1&destination=Rua+das+Tesouras%2C+128+-+Centro%2C+Paul%C3%ADnia+-+SP" target="_blank" rel="noopener">📍 Como chegar</a>
+        <a class="btn link-btn instagram-btn" href="https://instagram.com/navalhaeoficio" target="_blank" rel="noopener">📷 @navalhaeoficio</a>
+      </div>
+
+      <div class="cat-label">Informações</div>
+      <div class="info-card">
+        <div class="row"><span>Endereço</span><span>Rua das Tesouras, 128</span></div>
+        <div class="row"><span>Bairro</span><span>Centro, Paulínia/SP</span></div>
+        <div class="row"><span>Seg – Sex</span><span>09:00 – 20:00</span></div>
+        <div class="row"><span>Sábado</span><span>09:00 – 18:00</span></div>
+        <div class="row"><span>Domingo</span><span>09:00 – 13:00</span></div>
+        <div class="row"><span>Telefone</span><span>(19) 99999-0000</span></div>
+      </div>
+
+      <div class="cat-label">Política de cancelamento</div>
+      <div class="info-card policy-card">
+        <p>Cancelamentos com até <strong>2 horas de antecedência</strong> não geram cobrança.</p>
+        <p>Cancelamentos com menos de 2 horas ou não comparecimento (no-show) podem ter uma taxa de <strong>50% do valor do serviço</strong> cobrada no próximo agendamento.</p>
+        <p>Para cancelar ou remarcar, entre em contato pelo WhatsApp com o máximo de antecedência possível.</p>
+      </div>
+
+      <button class="staff-demo-link" id="staffDemoBtn" type="button">🔒 Área do barbeiro (demonstração)</button>
+    </div>
+
+    <div class="panel" id="panel-profissionais" role="tabpanel" aria-labelledby="tab-profissionais"></div>
+
+    <div class="panel" id="panel-avaliacoes" role="tabpanel" aria-labelledby="tab-avaliacoes">
+      <div id="reviewsSummary"></div>
+      <button class="btn btn-primary" id="openReviewBtn" style="margin-bottom:18px;">Deixar avaliação</button>
+      <div id="reviewsList"></div>
+    </div>
+
+    <div class="panel" id="panel-fidelidade" role="tabpanel" aria-labelledby="tab-fidelidade">
+      <div class="loyalty-card">
+        <h3>Clube Navalha</h3>
+        <p>A cada 10 cortes, o próximo sai por nossa conta.</p>
+        <div class="loyalty-bar"><div class="loyalty-fill"></div></div>
+        <div class="loyalty-count">6 de 10 cortes</div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="multi-select-bar" id="multiSelectBar">
+    <div class="msb-info">
+      <strong id="msbCount"></strong>
+      <span id="msbDuration"></span>
+    </div>
+    <button class="btn btn-primary" id="msbContinueBtn">Agendar selecionados</button>
+  </div>
+
+  <div class="sheet-overlay" id="sheetOverlay" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <div>
+          <div class="title" id="sheetTitle">Agendar</div>
+          <div class="sub" id="sheetStepLabel">Passo 1 de 3</div>
+        </div>
+        <button class="sheet-close" id="sheetClose" aria-label="Fechar">✕</button>
+      </div>
+      <div class="sheet-progress"><div class="sheet-progress-fill" id="sheetProgressFill"></div></div>
+      <div class="sheet-body" id="sheetBody"></div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary" id="sheetCta"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-overlay" id="reviewSheetOverlay" role="dialog" aria-modal="true" aria-labelledby="reviewSheetTitleText">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <div>
+          <div class="title" id="reviewSheetTitleText">Deixar avaliação</div>
+          <div class="sub">Conte como foi sua experiência</div>
+        </div>
+        <button class="sheet-close" id="reviewSheetClose" aria-label="Fechar">✕</button>
+      </div>
+      <div class="sheet-body" id="reviewSheetBody"></div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary" id="reviewSheetCta">Enviar avaliação</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-overlay" id="loginSheetOverlay" role="dialog" aria-modal="true" aria-labelledby="loginSheetTitle">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <div>
+          <div class="title" id="loginSheetTitle">Entrar</div>
+          <div class="sub" id="loginSheetSub">Acesse sua conta</div>
+        </div>
+        <button class="sheet-close" id="loginSheetClose" aria-label="Fechar">✕</button>
+      </div>
+      <div class="sheet-body" id="loginSheetBody"></div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary" id="loginSheetCta"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-overlay" id="staffSheetOverlay" role="dialog" aria-modal="true" aria-labelledby="staffSheetTitle">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <div>
+          <div class="title" id="staffSheetTitle">Área do barbeiro</div>
+          <div class="sub" id="staffSheetSub">Demonstração — visão da equipe</div>
+        </div>
+        <button class="sheet-close" id="staffSheetClose" aria-label="Fechar">✕</button>
+      </div>
+      <div class="demo-badge">
+        <span class="dot"></span>
+        <div><strong>Modo demonstração</strong><span>Dados simulados</span></div>
+      </div>
+      <div class="sheet-body" id="staffSheetBody"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+
+  /* ---------- Tema claro/escuro ---------- */
+  const THEME_KEY = 'navalha-theme';
+  function getSavedTheme(){ try { return localStorage.getItem(THEME_KEY); } catch(e){ return null; } }
+  function saveTheme(theme){ try { localStorage.setItem(THEME_KEY, theme); } catch(e){} }
+  function applyTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('themeToggleBtn');
+    if(btn){
+      btn.textContent = theme === 'light' ? '☀️' : '🌙';
+      btn.setAttribute('aria-label', theme === 'light' ? 'Mudar para tema escuro' : 'Mudar para tema claro');
+    }
+  }
+  applyTheme(getSavedTheme() || 'dark');
+  document.getElementById('themeToggleBtn').addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    saveTheme(next);
+  });
+
+  /* ---------- Compartilhar ---------- */
+  document.getElementById('shareBtn').addEventListener('click', async () => {
+    const shareData = {
+      title: 'Navalha & Ofício — Barbearia em Paulínia',
+      text: 'Dá uma olhada na Navalha & Ofício e agenda seu horário!',
+      url: window.location.href
+    };
+    if(navigator.share){
+      try { await navigator.share(shareData); } catch(e){ /* usuário cancelou o compartilhamento */ }
+      return;
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      try {
+        await navigator.clipboard.writeText(shareData.url);
+        alert('Link copiado! Agora é só colar onde quiser compartilhar.');
+        return;
+      } catch(e){ /* segue para o fallback abaixo */ }
+    }
+    alert(shareData.url);
+  });
+
+  const CATEGORIES = [
+    { id:'todos', label:'Todos' },
+    { id:'favoritos', label:'♥ Favoritos' },
+    { id:'padrao', label:'Padrão' },
+    { id:'extra', label:'Extra' },
+    { id:'domingo', label:'Domingo' },
+    { id:'clube', label:'Clube' },
+    { id:'outros', label:'Outros' }
+  ];
+
+  const SERVICES = [
+    { id:'s1', cat:'padrao', icon:'✂️', name:'Corte', desc:'Corte tradicional com tesoura e máquina', price:50, duration:30 },
+    { id:'s2', cat:'padrao', icon:'🪒', name:'Barba', desc:'Barba desenhada com toalha quente', price:35, duration:30 },
+    { id:'s3', cat:'padrao', icon:'💈', name:'Corte + Barba', desc:'Combo completo — corte e barba', price:75, duration:60 },
+    { id:'s4', cat:'extra', icon:'👁️', name:'Sobrancelha', desc:'Design e acabamento com navalha', price:15, duration:15 },
+    { id:'s5', cat:'extra', icon:'🎨', name:'Pigmentação de barba', desc:'Uniformiza falhas e realça o contorno', price:40, duration:20 },
+    { id:'s6', cat:'domingo', icon:'✂️', name:'Corte Domingo', desc:'Corte tradicional aos domingos', price:60, duration:30 },
+    { id:'s7', cat:'domingo', icon:'🪒', name:'Barba Domingo', desc:'Barba desenhada aos domingos', price:45, duration:30 },
+    { id:'s8', cat:'clube', icon:'✂️', name:'Clube · Corte', desc:'Serviço de corte para assinantes do Clube Navalha', price:null, duration:30 },
+    { id:'s9', cat:'clube', icon:'🪒', name:'Clube · Barba', desc:'Serviço de barba para assinantes do Clube Navalha', price:null, duration:30 },
+    { id:'s10', cat:'clube', icon:'💈', name:'Clube · Combo', desc:'Corte e barba para assinantes do Clube Navalha', price:null, duration:60 },
+    { id:'s11', cat:'outros', icon:'🧒', name:'Corte infantil', desc:'Corte para crianças até 12 anos', price:40, duration:30 },
+    { id:'s12', cat:'outros', icon:'🧔', name:'Design de cavanhaque', desc:'Alinhamento e contorno com navalha', price:25, duration:20 }
+  ];
+
+  const BARBERS = [
+    { id:'renato', name:'Renato Silva', role:'Especialista em degradê', photo:'https://i.pravatar.cc/200?img=12' },
+    { id:'diego', name:'Diego Torres', role:'Barba & bigode', photo:'https://i.pravatar.cc/200?img=33' },
+    { id:'kaique', name:'Kaique Ferreira', role:'Cortes clássicos', photo:'https://i.pravatar.cc/200?img=68' }
+  ];
+
+  // Avaliações mock — em produção viriam do backend, junto com fotos reais dos clientes
+  const REVIEWS = [
+    { name:'Marcelo A.', rating:5, meta:'Corte + Barba · há 3 dias', text:'Melhor barbearia de Paulínia sem dúvida. O Renato mandou muito bem no degradê.', photos:['https://picsum.photos/seed/corte1/200/200'] },
+    { name:'Bruno T.', rating:5, meta:'Barba · há 1 semana', text:'Ambiente top e o Diego é fera na navalha. Voltarei sempre.', photos:[] },
+    { name:'Felipe R.', rating:4, meta:'Corte · há 2 semanas', text:'Muito bom, só demorou um pouco além do horário marcado.', photos:['https://picsum.photos/seed/corte2/200/200','https://picsum.photos/seed/corte3/200/200'] },
+    { name:'Gustavo M.', rating:5, meta:'Corte + Barba · há 3 semanas', text:'Atendimento excelente do início ao fim, recomendo demais.', photos:[] },
+    { name:'Thiago L.', rating:5, meta:'Design de cavanhaque · há 1 mês', text:'O Kaique é muito detalhista, ficou perfeito.', photos:['https://picsum.photos/seed/corte4/200/200'] }
+  ];
+
+  /* ---------- Perfil do cliente: geração de histórico mock e estatísticas ---------- */
+  const PREFERENCE_OPTIONS = ['Degradê alto', 'Navalha', 'Barba curta', 'Barba longa', 'Corte social', 'Sem máquina 0', 'Sobrancelha sempre'];
+  const WEEKDAY_SHORT = ['dom','seg','ter','qua','qui','sex','sáb'];
+
+  function fmtShortDate(d){
+    return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+  }
+
+  function generateMockHistory(){
+    const count = 3 + Math.floor(Math.random() * 3); // 3 a 5 visitas
+    const entries = [];
+    let cursor = new Date();
+    for(let i = 0; i < count; i++){
+      const daysBack = 16 + Math.floor(Math.random() * 22); // 16-37 dias entre visitas
+      cursor = new Date(cursor.getTime() - daysBack * 86400000);
+      const svc = SERVICES[Math.floor(Math.random() * SERVICES.length)];
+      const barber = BARBERS[Math.floor(Math.random() * BARBERS.length)];
+      entries.push({ date:new Date(cursor), service:svc.name, barber:barber.name, price: svc.price === null ? 40 : svc.price });
+    }
+    return entries; // já em ordem do mais recente para o mais antigo
+  }
+
+  function computeClientStats(history){
+    if(!history || history.length === 0) return null;
+    const total = history.reduce((sum, h) => sum + h.price, 0);
+    const barberCounts = {};
+    history.forEach(h => { barberCounts[h.barber] = (barberCounts[h.barber] || 0) + 1; });
+    const favBarber = Object.entries(barberCounts).sort((a, b) => b[1] - a[1])[0][0];
+    let totalGap = 0;
+    for(let i = 0; i < history.length - 1; i++){
+      totalGap += Math.round((history[i].date - history[i + 1].date) / 86400000);
+    }
+    const avgGap = history.length > 1 ? Math.round(totalGap / (history.length - 1)) : null;
+    return { total, favBarber, avgGap, last:history[0] };
+  }
+
+  /* ---------- Painel do barbeiro (demonstração de CRM) ---------- */
+  const STAFF_QUICK_NOTES = ['Café sem açúcar', 'Não gosta de conversa', 'Pele sensível', 'Alergia', 'Máquina 1 nas laterais', 'Fazer acabamento na sobrancelha'];
+
+  const CLIENTS_MOCK = [
+    { id:'c1', name:'André Barbosa', notes:'Sempre pede degradê bem baixo nas laterais. Conversa bastante sobre carros.', preferences:['Degradê alto','Navalha'], quickNotes:['Máquina 1 nas laterais'], history:generateMockHistory() },
+    { id:'c2', name:'Vinícius Prado', notes:'Prefere silêncio durante o atendimento. Alérgico a alguns pós-barba com álcool.', preferences:['Barba curta','Sem máquina 0'], quickNotes:['Não gosta de conversa','Alergia'], history:generateMockHistory() },
+    { id:'c3', name:'Eduardo Nakamura', notes:'Cliente antigo, sempre agenda com o Kaique. Gosta de pontualidade.', preferences:['Corte social'], quickNotes:[], history:generateMockHistory() },
+    { id:'c4', name:'Ricardo Almeida', notes:'Costuma atrasar uns 10-15 min. Bom cliente, sempre fecha o combo completo.', preferences:['Degradê alto','Barba longa'], quickNotes:['Café sem açúcar','Fazer acabamento na sobrancelha'], history:generateMockHistory() }
+  ];
+
+  const STAFF_DASHBOARD = {
+    totalClients: 182,
+    todayAppointments: 8,
+    todayRevenue: 610,
+    topReturningClient: { name:'Lucas M.', visits:18 }
+  };
+
+  const DOW = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+  const MONTHS = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+
+  // Horário de funcionamento por dia da semana (0=domingo ... 6=sábado)
+  const BUSINESS_HOURS = {
+    0: { open:9, close:13 },
+    1: { open:9, close:20 }, 2: { open:9, close:20 }, 3: { open:9, close:20 },
+    4: { open:9, close:20 }, 5: { open:9, close:20 },
+    6: { open:9, close:18 }
+  };
+
+  function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+  function timesForDate(date){
+    const hours = BUSINESS_HOURS[date.getDay()];
+    const t = [];
+    for(let h=hours.open; h<hours.close; h++){
+      t.push(h.toString().padStart(2,'0')+':00');
+      t.push(h.toString().padStart(2,'0')+':30');
+    }
+    t.push(hours.close.toString().padStart(2,'0')+':00');
+    return t;
+  }
+
+  // Ocupação determinística (mock) baseada na data, barbeiro e horário — em produção viria do backend
+  function occupied(bIdx, date, tIdx){
+    const seed = date.getFullYear()*372 + date.getMonth()*31 + date.getDate();
+    return (tIdx + bIdx*2 + seed*3) % 7 === 0 || (tIdx*3 + bIdx + seed) % 11 === 0;
+  }
+  function money(n){ return n === null ? 'Consultar' : 'R$ ' + n.toFixed(0); }
+
+  /* ---------- Tabs ---------- */
+  const tabsNav = document.getElementById('tabs');
+  const tabButtons = Array.from(tabsNav.querySelectorAll('.tab-btn'));
+
+  function activateTab(btn, focusIt){
+    tabButtons.forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+      b.tabIndex = -1;
+    });
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    btn.tabIndex = 0;
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    if(focusIt) btn.focus();
+  }
+
+  tabsNav.addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if(!btn) return;
+    activateTab(btn, false);
+  });
+
+  tabsNav.addEventListener('keydown', e => {
+    if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key)) return;
+    const current = tabButtons.findIndex(b => b.classList.contains('active'));
+    let next = current;
+    if(e.key === 'ArrowRight') next = (current + 1) % tabButtons.length;
+    else if(e.key === 'ArrowLeft') next = (current - 1 + tabButtons.length) % tabButtons.length;
+    else if(e.key === 'Home') next = 0;
+    else if(e.key === 'End') next = tabButtons.length - 1;
+    e.preventDefault();
+    activateTab(tabButtons[next], true);
+  });
+
+  /* ---------- Catalog: categories + search ---------- */
+  let activeCat = 'todos';
+  let searchTerm = '';
+
+  const FAV_KEY = 'navalha-favoritos';
+  function loadFavorites(){
+    try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY)) || []); } catch(e){ return new Set(); }
+  }
+  function saveFavorites(){ try { localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(FAVORITES))); } catch(e){} }
+  const FAVORITES = loadFavorites();
+  const SELECTED = new Set();
+
+  function renderCategories(){
+    const el = document.getElementById('catScroller');
+    el.innerHTML = CATEGORIES.map(c => `<button class="cat-chip ${activeCat===c.id?'active':''}" data-cat="${c.id}">${c.label}</button>`).join('');
+    el.querySelectorAll('.cat-chip').forEach(chip => {
+      chip.addEventListener('click', () => { activeCat = chip.dataset.cat; renderCategories(); renderServices(); });
+    });
+  }
+
+  function renderMultiSelectBar(){
+    const bar = document.getElementById('multiSelectBar');
+    const panel = document.getElementById('panel-servicos');
+    if(SELECTED.size === 0){ bar.classList.remove('visible'); panel.style.paddingBottom = ''; return; }
+    const items = SERVICES.filter(s => SELECTED.has(s.id));
+    const totalDuration = items.reduce((sum, s) => sum + s.duration, 0);
+    const hasUnknownPrice = items.some(s => s.price === null);
+    const totalPrice = items.reduce((sum, s) => sum + (s.price || 0), 0);
+    const hours = Math.floor(totalDuration / 60);
+    const mins = totalDuration % 60;
+    const durationLabel = hours > 0 ? `${hours}h${mins > 0 ? mins + 'min' : ''}` : `${mins}min`;
+    document.getElementById('msbCount').textContent = `${items.length} serviço${items.length > 1 ? 's' : ''} selecionado${items.length > 1 ? 's' : ''}`;
+    document.getElementById('msbDuration').textContent = `⏱ ${durationLabel} total · ${hasUnknownPrice ? 'a partir de ' : ''}${money(totalPrice)}`;
+    bar.classList.add('visible');
+    panel.style.paddingBottom = '86px';
+  }
+
+  function renderServices(){
+    const el = document.getElementById('serviceList');
+    const filtered = SERVICES.filter(s => {
+      const matchCat = activeCat === 'todos' || (activeCat === 'favoritos' ? FAVORITES.has(s.id) : s.cat === activeCat);
+      const matchSearch = !searchTerm || s.name.toLowerCase().includes(searchTerm) || s.desc.toLowerCase().includes(searchTerm);
+      return matchCat && matchSearch;
+    });
+    if(filtered.length === 0){
+      el.innerHTML = `<div class="empty-state">${activeCat === 'favoritos' ? 'Você ainda não favoritou nenhum serviço.' : 'Nenhum serviço encontrado.'}</div>`;
+      return;
+    }
+    el.innerHTML = filtered.map(s => `
+      <div class="service-row">
+        <button class="svc-select ${SELECTED.has(s.id)?'selected':''}" data-id="${s.id}" aria-pressed="${SELECTED.has(s.id)}" aria-label="Selecionar ${s.name} para agendar junto com outros serviços"></button>
+        <div class="svc-icon">${s.icon}</div>
+        <div class="svc-info">
+          <div class="svc-name">${s.name}</div>
+          <div class="svc-desc">${s.desc}</div>
+          <div class="svc-meta">
+            <span class="svc-price">${money(s.price)}</span>
+            <span class="svc-duration">⏱ ${s.duration} min</span>
+          </div>
+        </div>
+        <div class="svc-actions">
+          <button class="svc-fav ${FAVORITES.has(s.id)?'active':''}" data-id="${s.id}" aria-pressed="${FAVORITES.has(s.id)}" aria-label="${FAVORITES.has(s.id) ? 'Remover ' + s.name + ' dos favoritos' : 'Adicionar ' + s.name + ' aos favoritos'}">${FAVORITES.has(s.id) ? '♥' : '♡'}</button>
+          <button class="svc-agendar" data-id="${s.id}">Agendar</button>
+        </div>
+      </div>
+    `).join('');
+    el.querySelectorAll('.svc-agendar').forEach(btn => {
+      btn.addEventListener('click', () => openSheet(btn.dataset.id));
+    });
+    el.querySelectorAll('.svc-fav').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        if(FAVORITES.has(id)) FAVORITES.delete(id); else FAVORITES.add(id);
+        saveFavorites();
+        renderServices();
+      });
+    });
+    el.querySelectorAll('.svc-select').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        if(SELECTED.has(id)) SELECTED.delete(id); else SELECTED.add(id);
+        renderServices();
+        renderMultiSelectBar();
+      });
+    });
+  }
+
+  document.getElementById('searchInput').addEventListener('input', e => {
+    searchTerm = e.target.value.trim().toLowerCase();
+    renderServices();
+  });
+
+  /* ---------- Skeleton loading ---------- */
+  function skeletonRows(kind, count){
+    if(kind === 'service'){
+      return Array.from({length:count}).map(() => `
+        <div class="service-row">
+          <div class="skeleton skel-avatar"></div>
+          <div class="svc-info">
+            <div class="skeleton skel-line medium" style="margin-bottom:8px;"></div>
+            <div class="skeleton skel-line long" style="margin-bottom:10px;"></div>
+            <div class="skeleton skel-line short"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+    if(kind === 'pro'){
+      return Array.from({length:count}).map(() => `
+        <div class="pro-row">
+          <div class="skeleton skel-avatar" style="width:52px;height:52px;"></div>
+          <div style="flex:1;">
+            <div class="skeleton skel-line medium" style="margin-bottom:8px;"></div>
+            <div class="skeleton skel-line short"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+    if(kind === 'review'){
+      return Array.from({length:count}).map(() => `
+        <div class="review-card">
+          <div class="review-head">
+            <div class="skeleton skel-avatar"></div>
+            <div style="flex:1;">
+              <div class="skeleton skel-line medium" style="margin-bottom:6px;"></div>
+              <div class="skeleton skel-line short"></div>
+            </div>
+          </div>
+          <div class="skeleton skel-line long" style="margin-bottom:6px;"></div>
+          <div class="skeleton skel-line medium"></div>
+        </div>
+      `).join('');
+    }
+    return '';
+  }
+
+  document.getElementById('serviceList').innerHTML = skeletonRows('service', 4);
+  document.getElementById('panel-profissionais').innerHTML = skeletonRows('pro', 3);
+  document.getElementById('reviewsList').innerHTML = skeletonRows('review', 2);
+
+  setTimeout(() => {
+    renderCategories();
+    renderServices();
+    renderProfissionais();
+    renderReviews();
+  }, 650);
+
+  /* ---------- Profissionais tab ---------- */
+  function renderProfissionais(){
+    document.getElementById('panel-profissionais').innerHTML = BARBERS.map(b => `
+      <div class="pro-row">
+        <img src="${b.photo}" alt="">
+        <div>
+          <div class="name">${b.name}</div>
+          <div class="role">${b.role}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ---------- Avaliações tab ---------- */
+  function starsHtml(rating, size){
+    let out = '';
+    for(let i=1; i<=5; i++) out += `<span class="${i<=rating?'':'empty'}">★</span>`;
+    return out;
+  }
+  function initials(name){
+    return name.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase();
+  }
+  function renderReviews(){
+    const avg = REVIEWS.reduce((s,r)=>s+r.rating,0) / REVIEWS.length;
+    document.getElementById('reviewsSummary').innerHTML = `
+      <div class="reviews-summary">
+        <div class="rating-big">${avg.toFixed(1)}</div>
+        <div class="rating-side">
+          <div class="rating-stars">${starsHtml(Math.round(avg))}</div>
+          <div class="rating-count">${REVIEWS.length} avaliações</div>
+        </div>
+      </div>
+    `;
+    document.getElementById('reviewsList').innerHTML = REVIEWS.map(r => `
+      <div class="review-card">
+        <div class="review-head">
+          <div class="review-avatar">${initials(r.name)}</div>
+          <div>
+            <div class="review-name">${r.name}</div>
+            <div class="review-meta">${r.meta}</div>
+          </div>
+          <div class="review-stars">${starsHtml(r.rating)}</div>
+        </div>
+        <p class="review-text">${r.text}</p>
+        ${r.photos.length ? `<div class="review-photos">${r.photos.map(p=>`<img src="${p}" alt="Foto do corte">`).join('')}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  /* ---------- Nova avaliação (sheet) ---------- */
+  const reviewOverlay = document.getElementById('reviewSheetOverlay');
+  const reviewSheetBody = document.getElementById('reviewSheetBody');
+  const reviewSheetCta = document.getElementById('reviewSheetCta');
+  const rstate = { rating:0, name:'', text:'' };
+
+  function lockScroll(){ document.body.style.overflow = 'hidden'; }
+  function unlockScroll(){ document.body.style.overflow = ''; }
+
+  /* ---------- Acessibilidade: trap de foco + Esc para fechar modais ---------- */
+  let lastFocusedEl = null;
+  let activeOverlayKeyHandler = null;
+
+  function getFocusable(container){
+    return Array.from(container.querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(el => el.offsetParent !== null);
+  }
+
+  function trapFocusOpen(overlayEl, onRequestClose){
+    lastFocusedEl = document.activeElement;
+    setTimeout(() => {
+      const focusables = getFocusable(overlayEl);
+      if(focusables.length) focusables[0].focus();
+    }, 50);
+    activeOverlayKeyHandler = function(e){
+      if(e.key === 'Escape'){ e.preventDefault(); onRequestClose(); return; }
+      if(e.key === 'Tab'){
+        const focusables = getFocusable(overlayEl);
+        if(focusables.length === 0) return;
+        const first = focusables[0], last = focusables[focusables.length - 1];
+        if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+        else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+      }
+    };
+    document.addEventListener('keydown', activeOverlayKeyHandler);
+  }
+
+  function trapFocusClose(){
+    if(activeOverlayKeyHandler){ document.removeEventListener('keydown', activeOverlayKeyHandler); activeOverlayKeyHandler = null; }
+    if(lastFocusedEl){ lastFocusedEl.focus(); lastFocusedEl = null; }
+  }
+
+  /* ---------- Mensagens de erro acessíveis ---------- */
+  function setFieldError(input, message){
+    input.classList.add('error');
+    input.setAttribute('aria-invalid', 'true');
+    const msgId = input.id + '-error';
+    input.setAttribute('aria-describedby', msgId);
+    let msgEl = document.getElementById(msgId);
+    if(!msgEl){
+      msgEl = document.createElement('p');
+      msgEl.id = msgId;
+      msgEl.className = 'field-error';
+      msgEl.setAttribute('role', 'alert');
+      input.insertAdjacentElement('afterend', msgEl);
+    }
+    msgEl.textContent = '⚠ ' + message;
+  }
+  function clearFieldError(input){
+    input.classList.remove('error');
+    input.removeAttribute('aria-invalid');
+    input.removeAttribute('aria-describedby');
+    const msgEl = document.getElementById(input.id + '-error');
+    if(msgEl) msgEl.remove();
+  }
+
+  function openReviewSheet(){
+    rstate.rating = 0; rstate.name = ustate.loggedIn ? ustate.name : ''; rstate.text = '';
+    reviewOverlay.classList.add('open');
+    lockScroll();
+    renderReviewSheet();
+    trapFocusOpen(reviewOverlay, closeReviewSheet);
+  }
+  function closeReviewSheet(){ reviewOverlay.classList.remove('open'); unlockScroll(); trapFocusClose(); }
+  document.getElementById('openReviewBtn').addEventListener('click', openReviewSheet);
+  document.getElementById('reviewSheetClose').addEventListener('click', closeReviewSheet);
+  reviewOverlay.addEventListener('click', e => { if(e.target === reviewOverlay) closeReviewSheet(); });
+
+  function renderReviewSheet(){
+    reviewSheetBody.innerHTML = `
+      <div class="star-picker" id="starPicker" role="radiogroup" aria-label="Sua nota, de 1 a 5 estrelas" aria-describedby="ratingError">
+        ${[1,2,3,4,5].map(i => `<button type="button" data-star="${i}" role="radio" aria-checked="${i<=rstate.rating}" aria-label="${i} estrela${i>1?'s':''}" class="${i<=rstate.rating?'active':''}">★</button>`).join('')}
+      </div>
+      <p id="ratingError" class="field-error" role="alert" style="justify-content:center; ${rstate.rating ? 'display:none;' : ''}">${rstate.rating ? '' : ''}</p>
+      <div class="field"><label for="reviewNameInput">Seu nome</label><input id="reviewNameInput" type="text" placeholder="Seu nome" value="${rstate.name}"></div>
+      <div class="field"><label for="reviewTextInput">Comentário</label><textarea id="reviewTextInput" class="review-textarea" placeholder="Conte como foi o atendimento...">${rstate.text}</textarea></div>
+    `;
+    reviewSheetBody.querySelectorAll('#starPicker button').forEach(btn => {
+      btn.addEventListener('click', () => { rstate.rating = parseInt(btn.dataset.star); renderReviewSheet(); });
+    });
+    const nameEl = document.getElementById('reviewNameInput');
+    const textEl = document.getElementById('reviewTextInput');
+    nameEl.addEventListener('input', e => { rstate.name = e.target.value; clearFieldError(nameEl); });
+    textEl.addEventListener('input', e => { rstate.text = e.target.value; clearFieldError(textEl); });
+  }
+
+  reviewSheetCta.addEventListener('click', () => {
+    const nameInput = document.getElementById('reviewNameInput');
+    const textInput = document.getElementById('reviewTextInput');
+    const ratingError = document.getElementById('ratingError');
+    let valid = true;
+    if(!rstate.rating){ ratingError.textContent = '⚠ Selecione uma nota de 1 a 5 estrelas'; ratingError.style.display = 'flex'; valid = false; }
+    else { ratingError.style.display = 'none'; }
+    if(!rstate.name.trim()){ setFieldError(nameInput, 'Informe seu nome'); valid = false; } else clearFieldError(nameInput);
+    if(!rstate.text.trim()){ setFieldError(textInput, 'Escreva um breve comentário'); valid = false; } else clearFieldError(textInput);
+    if(!valid) return;
+    REVIEWS.unshift({ name:rstate.name.trim(), rating:rstate.rating, meta:'agora mesmo', text:rstate.text.trim(), photos:[] });
+    renderReviews();
+    closeReviewSheet();
+  });
+
+  /* ---------- Booking sheet ---------- */
+  const overlay = document.getElementById('sheetOverlay');
+  const sheetTitle = document.getElementById('sheetTitle');
+  const sheetStepLabel = document.getElementById('sheetStepLabel');
+  const sheetProgressFill = document.getElementById('sheetProgressFill');
+  const sheetBody = document.getElementById('sheetBody');
+  const sheetCta = document.getElementById('sheetCta');
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const bstate = { service:null, step:0, barberIdx:null, date:null, time:null, name:'', phone:'', calYear:today.getFullYear(), calMonth:today.getMonth() };
+
+  function openSheet(serviceOrId){
+    bstate.service = typeof serviceOrId === 'string' ? SERVICES.find(s => s.id === serviceOrId) : serviceOrId;
+    bstate.step = 0; bstate.barberIdx = null; bstate.date = null; bstate.time = null;
+    bstate.name = ustate.loggedIn ? ustate.name : ''; bstate.phone = ustate.loggedIn ? ustate.phone : '';
+    bstate.calYear = today.getFullYear(); bstate.calMonth = today.getMonth();
+    sheetTitle.textContent = bstate.service.name;
+    overlay.classList.add('open');
+    lockScroll();
+    renderSheet();
+    trapFocusOpen(overlay, closeSheet);
+  }
+  function closeSheet(){ overlay.classList.remove('open'); unlockScroll(); trapFocusClose(); }
+  document.getElementById('sheetClose').addEventListener('click', closeSheet);
+  overlay.addEventListener('click', e => { if(e.target === overlay) closeSheet(); });
+
+  document.getElementById('msbContinueBtn').addEventListener('click', () => {
+    const items = SERVICES.filter(s => SELECTED.has(s.id));
+    if(items.length === 0) return;
+    const hasUnknownPrice = items.some(s => s.price === null);
+    const combined = {
+      id:'combo-' + Array.from(SELECTED).join('-'),
+      name: items.length === 1 ? items[0].name : `${items.length} serviços (${items.map(i => i.name).join(', ')})`,
+      price: hasUnknownPrice ? null : items.reduce((sum, s) => sum + s.price, 0),
+      duration: items.reduce((sum, s) => sum + s.duration, 0)
+    };
+    openSheet(combined);
+  });
+
+  function renderSheet(){
+    sheetStepLabel.textContent = bstate.step === 3 ? 'Confirmado' : `Passo ${bstate.step+1} de 3`;
+    sheetProgressFill.style.width = bstate.step === 3 ? '100%' : `${((bstate.step+1)/3)*100}%`;
+
+    if(bstate.step === 0) renderSheetStep0();
+    else if(bstate.step === 1) renderSheetStep1();
+    else if(bstate.step === 2) renderSheetStep2();
+    else renderSheetStep3();
+  }
+
+  function renderSheetStep0(){
+    sheetBody.innerHTML = `
+      <div class="step-heading"><h2>Escolha o profissional</h2><p>${bstate.service.name} · ${money(bstate.service.price)} · ${bstate.service.duration} min</p></div>
+      <div class="barber-list">
+        ${BARBERS.map((b,i) => `
+          <button class="barber-select-row ${bstate.barberIdx===i?'selected':''}" data-idx="${i}">
+            <img src="${b.photo}" alt="">
+            <div><div class="name">${b.name}</div><div class="role">${b.role}</div></div>
+            <div class="check">✓</div>
+          </button>
+        `).join('')}
+      </div>
+    `;
+    sheetBody.querySelectorAll('.barber-select-row').forEach(row => {
+      row.addEventListener('click', () => { bstate.barberIdx = parseInt(row.dataset.idx); renderSheet(); });
+    });
+    sheetCta.textContent = 'Continuar';
+    sheetCta.disabled = bstate.barberIdx === null;
+  }
+
+  function renderSheetStep1(){
+    const periods = [
+      { title:'Manhã', filter:t => parseInt(t) < 12 },
+      { title:'Tarde', filter:t => parseInt(t) >= 12 && parseInt(t) < 18 },
+      { title:'Noite', filter:t => parseInt(t) >= 18 }
+    ];
+
+    const firstOfMonth = new Date(bstate.calYear, bstate.calMonth, 1);
+    const daysInMonth = new Date(bstate.calYear, bstate.calMonth+1, 0).getDate();
+    const startOffset = firstOfMonth.getDay();
+    const isCurrentMonth = bstate.calYear === today.getFullYear() && bstate.calMonth === today.getMonth();
+
+    let cells = '';
+    for(let i=0; i<startOffset; i++) cells += `<div class="day-cell empty"></div>`;
+    for(let d=1; d<=daysInMonth; d++){
+      const cellDate = new Date(bstate.calYear, bstate.calMonth, d);
+      const isPast = cellDate < today;
+      const isSelected = bstate.date && sameDay(cellDate, bstate.date);
+      const isToday = sameDay(cellDate, today);
+      cells += `<button class="day-cell ${isSelected?'selected':''} ${isToday?'today':''}" data-day="${d}" ${isPast?'disabled':''}>${d}</button>`;
+    }
+
+    const timesHtml = bstate.date ? periods.map(p => {
+      const times = timesForDate(bstate.date).filter(p.filter);
+      if(times.length === 0) return '';
+      return `
+        <div class="period-block">
+          <div class="period-title">${p.title}</div>
+          <div class="time-grid">
+            ${times.map((t,ti) => {
+              const occ = occupied(bstate.barberIdx, bstate.date, ti);
+              return `<button class="time-slot ${bstate.time===t?'selected':''}" data-time="${t}" ${occ?'disabled':''}>${t}</button>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }).join('') : `<p style="color:var(--ivory-dim); font-size:0.85rem;">Selecione uma data para ver os horários.</p>`;
+
+    sheetBody.innerHTML = `
+      <button class="back-inline" id="sheetBack">‹ Trocar profissional</button>
+      <div class="step-heading"><h2>Data e horário</h2><p>Horários riscados já estão ocupados.</p></div>
+      <div class="month-nav">
+        <button class="month-nav-btn" id="prevMonth" aria-label="Mês anterior" ${isCurrentMonth?'disabled':''}>‹</button>
+        <div class="month-label">${MONTHS[bstate.calMonth]} de ${bstate.calYear}</div>
+        <button class="month-nav-btn" id="nextMonth" aria-label="Próximo mês">›</button>
+      </div>
+      <div class="calendar-dow">${DOW.map(d=>`<span>${d}</span>`).join('')}</div>
+      <div class="calendar-grid">${cells}</div>
+      ${timesHtml}
+    `;
+    document.getElementById('sheetBack').addEventListener('click', () => { bstate.step = 0; renderSheet(); });
+    document.getElementById('prevMonth').addEventListener('click', () => {
+      bstate.calMonth -= 1;
+      if(bstate.calMonth < 0){ bstate.calMonth = 11; bstate.calYear -= 1; }
+      renderSheet();
+    });
+    document.getElementById('nextMonth').addEventListener('click', () => {
+      bstate.calMonth += 1;
+      if(bstate.calMonth > 11){ bstate.calMonth = 0; bstate.calYear += 1; }
+      renderSheet();
+    });
+    sheetBody.querySelectorAll('.day-cell:not(.empty):not(:disabled)').forEach(cell => {
+      cell.addEventListener('click', () => {
+        bstate.date = new Date(bstate.calYear, bstate.calMonth, parseInt(cell.dataset.day));
+        bstate.time = null;
+        renderSheet();
+      });
+    });
+    sheetBody.querySelectorAll('.time-slot:not(:disabled)').forEach(slot => {
+      slot.addEventListener('click', () => { bstate.time = slot.dataset.time; renderSheet(); });
+    });
+    sheetCta.textContent = 'Continuar';
+    sheetCta.disabled = !bstate.time;
+  }
+
+  function formatDate(d){ return `${DOW[d.getDay()]} ${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}`; }
+
+  function renderSheetStep2(){
+    const b = BARBERS[bstate.barberIdx];
+    sheetBody.innerHTML = `
+      <button class="back-inline" id="sheetBack">‹ Trocar data e horário</button>
+      <div class="step-heading"><h2>Seus dados</h2><p>Confirme as informações para reservar.</p></div>
+      <div class="summary-card">
+        <div class="row"><img src="${b.photo}" alt=""><span>${b.name}</span></div>
+        <div class="row"><span class="label">Serviço</span><span class="val">${bstate.service.name}</span></div>
+        <div class="row"><span class="label">Dia</span><span class="val">${formatDate(bstate.date)}</span></div>
+        <div class="row"><span class="label">Horário</span><span class="val">${bstate.time}</span></div>
+        <div class="row"><span class="label">Valor</span><span class="val">${money(bstate.service.price)}</span></div>
+      </div>
+      <div class="field"><label for="nameInput">Nome completo</label><input id="nameInput" type="text" placeholder="Seu nome" value="${bstate.name}"></div>
+      <div class="field"><label for="phoneInput">WhatsApp</label><input id="phoneInput" type="tel" placeholder="(19) 99999-0000" value="${bstate.phone}"></div>
+    `;
+    document.getElementById('sheetBack').addEventListener('click', () => { bstate.step = 1; renderSheet(); });
+    const nameEl = document.getElementById('nameInput');
+    const phoneEl = document.getElementById('phoneInput');
+    nameEl.addEventListener('input', e => { bstate.name = e.target.value; clearFieldError(nameEl); });
+    phoneEl.addEventListener('input', e => { bstate.phone = e.target.value; clearFieldError(phoneEl); });
+    sheetCta.textContent = 'Confirmar agendamento';
+    sheetCta.disabled = false;
+  }
+
+  const BUSINESS_WHATSAPP = '5519999990000'; // (19) 99999-0000
+
+  function buildWhatsappLink(){
+    const b = BARBERS[bstate.barberIdx];
+    const msg = `Olá! Gostaria de confirmar meu agendamento na Navalha & Ofício:\n\n`
+      + `Serviço: ${bstate.service.name}\n`
+      + `Profissional: ${b.name}\n`
+      + `Dia: ${formatDate(bstate.date)}\n`
+      + `Horário: ${bstate.time}\n`
+      + `Valor: ${money(bstate.service.price)}\n\n`
+      + `Nome: ${bstate.name}\n`
+      + `Telefone: ${bstate.phone}`;
+    return `https://wa.me/${BUSINESS_WHATSAPP}?text=${encodeURIComponent(msg)}`;
+  }
+
+  function renderSheetStep3(){
+    const b = BARBERS[bstate.barberIdx];
+    sheetBody.innerHTML = `
+      <div class="success">
+        <div class="mark">✓</div>
+        <h2>Horário reservado</h2>
+        <p>Confirme seu agendamento no WhatsApp para garantir o horário.</p>
+        <div class="summary-card">
+          <div class="row"><img src="${b.photo}" alt=""><span>${b.name}</span></div>
+          <div class="row"><span class="label">Serviço</span><span class="val">${bstate.service.name}</span></div>
+          <div class="row"><span class="label">Dia</span><span class="val">${formatDate(bstate.date)}</span></div>
+          <div class="row"><span class="label">Horário</span><span class="val">${bstate.time}</span></div>
+        </div>
+        <button class="btn whatsapp-btn" id="whatsappBtn" type="button">Abrir WhatsApp ↗</button>
+      </div>
+    `;
+    document.getElementById('whatsappBtn').addEventListener('click', () => {
+      window.open(buildWhatsappLink(), '_blank');
+    });
+    sheetCta.textContent = 'Fechar';
+    sheetCta.disabled = false;
+  }
+
+  sheetCta.addEventListener('click', () => {
+    if(bstate.step === 2){
+      const nameInput = document.getElementById('nameInput');
+      const phoneInput = document.getElementById('phoneInput');
+      let valid = true;
+      if(!bstate.name.trim()){ setFieldError(nameInput, 'Informe seu nome completo'); valid = false; } else clearFieldError(nameInput);
+      if(!bstate.phone.trim()){ setFieldError(phoneInput, 'Informe seu número de WhatsApp'); valid = false; } else clearFieldError(phoneInput);
+      if(!valid) return;
+      bstate.step = 3; renderSheet();
+      window.open(buildWhatsappLink(), '_blank');
+      SELECTED.clear();
+      renderServices();
+      renderMultiSelectBar();
+      return;
+    }
+    if(bstate.step === 3){ closeSheet(); return; }
+    bstate.step += 1; renderSheet();
+  });
+
+  /* ---------- Login (simulado — sem OAuth real, apenas front-end) ---------- */
+  const GOOGLE_NAMES = ['Lucas Andrade', 'Marina Costa', 'Pedro Henrique', 'Camila Rocha'];
+  const APPLE_NAMES = ['Rafael Souza', 'Beatriz Lima', 'Gabriel Nunes', 'Isabela Martins'];
+
+  const ustate = { loggedIn:false, name:'', phone:'', method:'', step:'choose', pendingMethod:null, photo:'', history:[], preferences:new Set() };
+
+  const profileBtn = document.getElementById('profileBtn');
+  const loginOverlay = document.getElementById('loginSheetOverlay');
+  const loginSheetTitle = document.getElementById('loginSheetTitle');
+  const loginSheetSub = document.getElementById('loginSheetSub');
+  const loginSheetBody = document.getElementById('loginSheetBody');
+  const loginSheetCta = document.getElementById('loginSheetCta');
+
+  function updateProfileUI(){
+    if(ustate.loggedIn){
+      profileBtn.textContent = initials(ustate.name);
+      profileBtn.classList.add('logged-in');
+      profileBtn.setAttribute('aria-label', ustate.name);
+    } else {
+      profileBtn.textContent = '👤';
+      profileBtn.classList.remove('logged-in');
+      profileBtn.setAttribute('aria-label', 'Entrar');
+    }
+  }
+
+  function openLoginSheet(){
+    ustate.step = ustate.loggedIn ? 'account' : 'choose';
+    loginOverlay.classList.add('open');
+    lockScroll();
+    renderLoginSheet();
+    trapFocusOpen(loginOverlay, closeLoginSheet);
+  }
+  function closeLoginSheet(){ loginOverlay.classList.remove('open'); unlockScroll(); trapFocusClose(); }
+  profileBtn.addEventListener('click', openLoginSheet);
+  document.getElementById('loginSheetClose').addEventListener('click', closeLoginSheet);
+  loginOverlay.addEventListener('click', e => { if(e.target === loginOverlay) closeLoginSheet(); });
+
+  function finishLogin(name, phone, method){
+    ustate.loggedIn = true; ustate.name = name; ustate.phone = phone; ustate.method = method;
+    ustate.photo = `https://picsum.photos/seed/${encodeURIComponent(name)}/200/200`;
+    ustate.history = generateMockHistory();
+    ustate.preferences = new Set();
+    updateProfileUI();
+    closeLoginSheet();
+  }
+
+  function renderLoginSheet(){
+    if(ustate.step === 'choose'){
+      loginSheetTitle.textContent = 'Entrar';
+      loginSheetSub.textContent = 'Acesse sua conta';
+      loginSheetBody.innerHTML = `
+        <div class="login-options">
+          <button class="login-option-btn" data-provider="google"><span class="provider-icon google">G</span> Continuar com Google</button>
+          <button class="login-option-btn" data-provider="apple"><span class="provider-icon apple">🍎</span> Continuar com Apple</button>
+          <button class="login-option-btn" data-provider="whatsapp"><span class="provider-icon whatsapp">💬</span> Continuar com WhatsApp</button>
+          <button class="login-option-btn" data-provider="telefone"><span class="provider-icon telefone">📱</span> Continuar com telefone</button>
+        </div>
+        <p class="login-disclaimer">Este é um protótipo de front-end — o login aqui é simulado, sem autenticação real.</p>
+      `;
+      loginSheetCta.style.display = 'none';
+      loginSheetBody.querySelectorAll('.login-option-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const provider = btn.dataset.provider;
+          if(provider === 'google'){
+            finishLogin(GOOGLE_NAMES[Math.floor(Math.random()*GOOGLE_NAMES.length)], '', 'google');
+          } else if(provider === 'apple'){
+            finishLogin(APPLE_NAMES[Math.floor(Math.random()*APPLE_NAMES.length)], '', 'apple');
+          } else {
+            ustate.pendingMethod = provider; ustate.step = 'phone'; renderLoginSheet();
+          }
+        });
+      });
+      return;
+    }
+
+    if(ustate.step === 'phone'){
+      loginSheetTitle.textContent = ustate.pendingMethod === 'whatsapp' ? 'WhatsApp' : 'Telefone';
+      loginSheetSub.textContent = 'Informe seu número';
+      loginSheetBody.innerHTML = `
+        <button class="login-back" id="loginBack">‹ Voltar</button>
+        <div class="field"><label for="loginPhoneInput">Número de telefone</label><input id="loginPhoneInput" type="tel" placeholder="(19) 99999-0000"></div>
+      `;
+      loginSheetCta.style.display = 'flex';
+      loginSheetCta.textContent = 'Enviar código';
+      document.getElementById('loginBack').addEventListener('click', () => { ustate.step = 'choose'; renderLoginSheet(); });
+      const phoneEl = document.getElementById('loginPhoneInput');
+      phoneEl.addEventListener('input', () => clearFieldError(phoneEl));
+      loginSheetCta.onclick = () => {
+        if(!phoneEl.value.trim()){ setFieldError(phoneEl, 'Informe seu número de telefone'); return; }
+        ustate.pendingPhone = phoneEl.value.trim();
+        ustate.step = 'code'; renderLoginSheet();
+      };
+      return;
+    }
+
+    if(ustate.step === 'code'){
+      loginSheetTitle.textContent = 'Verificação';
+      loginSheetSub.textContent = `Código enviado para ${ustate.pendingPhone}`;
+      loginSheetBody.innerHTML = `
+        <button class="login-back" id="loginBack">‹ Voltar</button>
+        <div class="field"><label for="loginCodeInput">Código de 4 dígitos</label><input id="loginCodeInput" class="code-input" type="text" inputmode="numeric" maxlength="4" placeholder="0000"></div>
+        <p class="login-disclaimer">Simulação: digite qualquer código de 4 números para continuar.</p>
+      `;
+      loginSheetCta.style.display = 'flex';
+      loginSheetCta.textContent = 'Confirmar';
+      document.getElementById('loginBack').addEventListener('click', () => { ustate.step = 'phone'; renderLoginSheet(); });
+      const codeEl = document.getElementById('loginCodeInput');
+      codeEl.addEventListener('input', () => clearFieldError(codeEl));
+      loginSheetCta.onclick = () => {
+        if(codeEl.value.trim().length !== 4){ setFieldError(codeEl, 'Digite os 4 dígitos do código'); return; }
+        ustate.step = 'name'; renderLoginSheet();
+      };
+      return;
+    }
+
+    if(ustate.step === 'name'){
+      loginSheetTitle.textContent = 'Quase lá';
+      loginSheetSub.textContent = 'Como podemos te chamar?';
+      loginSheetBody.innerHTML = `
+        <div class="field"><label for="loginNameInput">Seu nome</label><input id="loginNameInput" type="text" placeholder="Seu nome"></div>
+      `;
+      loginSheetCta.style.display = 'flex';
+      loginSheetCta.textContent = 'Concluir cadastro';
+      const nameEl = document.getElementById('loginNameInput');
+      nameEl.addEventListener('input', () => clearFieldError(nameEl));
+      loginSheetCta.onclick = () => {
+        if(!nameEl.value.trim()){ setFieldError(nameEl, 'Informe seu nome'); return; }
+        finishLogin(nameEl.value.trim(), ustate.pendingPhone, ustate.pendingMethod);
+      };
+      return;
+    }
+
+    if(ustate.step === 'account'){
+      const stats = computeClientStats(ustate.history);
+      loginSheetTitle.textContent = ustate.name;
+      loginSheetSub.textContent = 'Seu perfil';
+      loginSheetBody.innerHTML = `
+        <div class="profile-head">
+          <img src="${ustate.photo}" alt="" class="profile-photo">
+          <div>
+            <div class="profile-name">${ustate.name}</div>
+            <div class="profile-sub">${ustate.phone || 'Login via ' + ({google:'Google', apple:'Apple'}[ustate.method] || ustate.method)}</div>
+          </div>
+        </div>
+
+        ${stats ? `
+          <div class="profile-stats">
+            <div class="profile-stat"><span class="v">${fmtShortDate(stats.last.date)}</span><span class="l">Último corte</span></div>
+            <div class="profile-stat"><span class="v">${stats.avgGap ? stats.avgGap + ' dias' : '—'}</span><span class="l">Frequência média</span></div>
+            <div class="profile-stat"><span class="v">${money(stats.total)}</span><span class="l">Total gasto</span></div>
+          </div>
+          <div class="summary-card" style="margin-bottom:18px;">
+            <div class="row"><span class="label">Barbeiro favorito</span><span class="val">${stats.favBarber}</span></div>
+          </div>
+        ` : ''}
+
+        <div class="cat-label">Suas preferências</div>
+        <div class="pref-chips" id="prefChips">
+          ${PREFERENCE_OPTIONS.map(p => `<button class="cat-chip ${ustate.preferences.has(p)?'active':''}" data-pref="${p}" type="button">${p}</button>`).join('')}
+        </div>
+
+        ${stats ? `
+          <div class="cat-label">Histórico de cortes</div>
+          <div class="history-list">
+            ${ustate.history.map(h => `
+              <div class="history-row">
+                <div>
+                  <div class="history-service">${h.service}</div>
+                  <div class="history-meta">${h.barber} · ${fmtShortDate(h.date)}</div>
+                </div>
+                <div class="history-price">${money(h.price)}</div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      `;
+      loginSheetBody.querySelectorAll('#prefChips .cat-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const p = chip.dataset.pref;
+          if(ustate.preferences.has(p)) ustate.preferences.delete(p); else ustate.preferences.add(p);
+          renderLoginSheet();
+        });
+      });
+      loginSheetCta.style.display = 'flex';
+      loginSheetCta.textContent = 'Sair da conta';
+      loginSheetCta.onclick = () => {
+        ustate.loggedIn = false; ustate.name = ''; ustate.phone = ''; ustate.method = '';
+        ustate.photo = ''; ustate.history = []; ustate.preferences = new Set();
+        updateProfileUI();
+        closeLoginSheet();
+      };
+      return;
+    }
+  }
+
+  /* ---------- Área do barbeiro (demonstração de CRM) ---------- */
+  const staffOverlay = document.getElementById('staffSheetOverlay');
+  const staffSheetSub = document.getElementById('staffSheetSub');
+  const staffSheetBody = document.getElementById('staffSheetBody');
+  let staffSelectedClientId = null;
+
+  function openStaffSheet(){
+    staffSelectedClientId = null;
+    staffOverlay.classList.add('open');
+    lockScroll();
+    renderStaffSheet();
+    trapFocusOpen(staffOverlay, closeStaffSheet);
+  }
+  function closeStaffSheet(){ staffOverlay.classList.remove('open'); unlockScroll(); trapFocusClose(); }
+  document.getElementById('staffDemoBtn').addEventListener('click', openStaffSheet);
+  document.getElementById('staffSheetClose').addEventListener('click', closeStaffSheet);
+  staffOverlay.addEventListener('click', e => { if(e.target === staffOverlay) closeStaffSheet(); });
+
+  function renderStaffSheet(){
+    if(!staffSelectedClientId){
+      staffSheetSub.textContent = `${CLIENTS_MOCK.length} clientes cadastrados`;
+      staffSheetBody.innerHTML = `
+        <div class="staff-dashboard">
+          <div class="dash-stat"><span class="v">${STAFF_DASHBOARD.totalClients}</span><span class="l">Clientes cadastrados</span></div>
+          <div class="dash-stat"><span class="v">${STAFF_DASHBOARD.todayAppointments}</span><span class="l">Agendamentos hoje</span></div>
+          <div class="dash-stat"><span class="v">${money(STAFF_DASHBOARD.todayRevenue)}</span><span class="l">Faturamento hoje</span></div>
+          <div class="dash-stat"><span class="v">${STAFF_DASHBOARD.topReturningClient.name}</span><span class="l">${STAFF_DASHBOARD.topReturningClient.visits} visitas · mais fiel</span></div>
+        </div>
+        <div class="cat-label">Clientes</div>
+        ${CLIENTS_MOCK.map(c => {
+          const stats = computeClientStats(c.history);
+          return `
+            <button class="staff-client-row" data-id="${c.id}">
+              <div class="avatar">${initials(c.name)}</div>
+              <div>
+                <div class="name">${c.name}</div>
+                <div class="meta">Último corte: ${fmtShortDate(stats.last.date)} · ${money(stats.total)} gastos</div>
+              </div>
+            </button>
+          `;
+        }).join('')}
+      `;
+      staffSheetBody.querySelectorAll('.staff-client-row').forEach(row => {
+        row.addEventListener('click', () => { staffSelectedClientId = row.dataset.id; renderStaffSheet(); });
+      });
+      return;
+    }
+
+    const client = CLIENTS_MOCK.find(c => c.id === staffSelectedClientId);
+    const stats = computeClientStats(client.history);
+    staffSheetSub.textContent = 'Ficha do cliente';
+    staffSheetBody.innerHTML = `
+      <button class="back-inline" id="staffBack">‹ Todos os clientes</button>
+      <div class="profile-head">
+        <div class="avatar" style="width:64px;height:64px;font-size:1.1rem;border-radius:50%;background:var(--brass-soft);color:var(--brass);display:flex;align-items:center;justify-content:center;flex-shrink:0;">${initials(client.name)}</div>
+        <div><div class="profile-name">${client.name}</div></div>
+      </div>
+      <div class="profile-stats">
+        <div class="profile-stat"><span class="v">${fmtShortDate(stats.last.date)}</span><span class="l">Último corte</span></div>
+        <div class="profile-stat"><span class="v">${stats.avgGap ? stats.avgGap + ' dias' : '—'}</span><span class="l">Frequência média</span></div>
+        <div class="profile-stat"><span class="v">${money(stats.total)}</span><span class="l">Total gasto</span></div>
+      </div>
+      <div class="summary-card" style="margin-bottom:18px;">
+        <div class="row"><span class="label">Barbeiro favorito</span><span class="val">${stats.favBarber}</span></div>
+      </div>
+
+      <div class="cat-label">Preferências</div>
+      <div class="pref-chips">
+        ${client.preferences.length ? client.preferences.map(p => `<span class="cat-chip active" style="pointer-events:none;">${p}</span>`).join('') : '<span style="color:var(--ivory-dim); font-size:0.82rem;">Nenhuma preferência registrada.</span>'}
+      </div>
+
+      <div class="cat-label">Histórico de cortes</div>
+      <div class="history-list">
+        ${client.history.map(h => `
+          <div class="history-row">
+            <div>
+              <div class="history-service">${h.service}</div>
+              <div class="history-meta">${h.barber} · ${fmtShortDate(h.date)}</div>
+            </div>
+            <div class="history-price">${money(h.price)}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="cat-label">Observações do barbeiro <span style="color:var(--ivory-dim); text-transform:none; letter-spacing:0;">(privado — cliente não vê)</span></div>
+      <div class="quick-notes" id="quickNotes">
+        ${STAFF_QUICK_NOTES.map((q, i) => `
+          <label class="quick-note-item">
+            <input type="checkbox" data-note="${q}" ${client.quickNotes.includes(q) ? 'checked' : ''}>
+            <span>${q}</span>
+          </label>
+        `).join('')}
+      </div>
+      <div class="field">
+        <textarea id="staffNotesInput" class="staff-notes-textarea" placeholder="Anotações sobre o cliente...">${client.notes}</textarea>
+      </div>
+    `;
+    staffSheetBody.querySelectorAll('#quickNotes input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const note = cb.dataset.note;
+        if(cb.checked){ if(!client.quickNotes.includes(note)) client.quickNotes.push(note); }
+        else { client.quickNotes = client.quickNotes.filter(n => n !== note); }
+      });
+    });
+    document.getElementById('staffBack').addEventListener('click', () => { staffSelectedClientId = null; renderStaffSheet(); });
+    document.getElementById('staffNotesInput').addEventListener('input', e => { client.notes = e.target.value; });
+  }
+
+})();
+</script>
+
+</body>
+</html>
