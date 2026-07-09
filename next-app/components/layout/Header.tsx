@@ -1,0 +1,41 @@
+export function Header() {
+  return (
+    <div className="cover">
+      <div
+        className="cover-photo"
+        style={{
+          backgroundImage:
+            "url('https://picsum.photos/seed/barbershop-interior/800/500')",
+        }}
+      >
+        <div className="cover-top">
+          <button className="icon-btn" aria-label="Voltar">
+            ‹
+          </button>
+          <div className="icon-btn-group">
+            <button className="icon-btn" aria-label="Alternar tema claro/escuro">
+              🌙
+            </button>
+            <button className="icon-btn" aria-label="Compartilhar barbearia">
+              📤
+            </button>
+            <button className="icon-btn" aria-label="Entrar">
+              👤
+            </button>
+            <button className="icon-btn" aria-label="Notificações">
+              🔔
+            </button>
+            <button className="icon-btn" aria-label="Favoritar">
+              ♡
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="brand-badge">
+        <span>N·O</span>
+      </div>
+      <div className="biz-name">Navalha &amp; Ofício — Centro Paulínia</div>
+      <div className="biz-address">Rua das Tesouras, 128 · Centro, Paulínia/SP</div>
+    </div>
+  );
+}
