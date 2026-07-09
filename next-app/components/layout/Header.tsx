@@ -1,3 +1,5 @@
+import { ThemeToggleButton } from "./ThemeToggleButton";
+
 export function Header() {
   return (
     <div className="cover">
@@ -13,9 +15,7 @@ export function Header() {
             ‹
           </button>
           <div className="icon-btn-group">
-            <button className="icon-btn" aria-label="Alternar tema claro/escuro">
-              🌙
-            </button>
+            <ThemeToggleButton />
             <button className="icon-btn" aria-label="Compartilhar barbearia">
               📤
             </button>
