@@ -147,7 +147,6 @@ function handleCtaClick(){
     if(!bstate.phone.trim()){ setFieldError(phoneInput, 'Informe seu número de WhatsApp'); valid = false; } else clearFieldError(phoneInput);
     if(!valid) return;
     bstate.step = 3; renderSheet();
-    window.open(buildWhatsappLink(), '_blank');
     if(onBookingConfirmedCb) onBookingConfirmedCb();
     return;
   }
