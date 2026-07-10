@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Header } from "./Header";
 import { Tabs, type TabItem } from "./Tabs";
 import { ServicosPanel } from "@/components/catalog/ServicosPanel";
+import { DetalhesPanel } from "@/components/catalog/DetalhesPanel";
 import { BookingSheet } from "@/components/booking/BookingSheet";
 import { LoginSheet } from "@/components/auth/LoginSheet";
 import { StaffSheet } from "@/components/staff/StaffSheet";
@@ -45,17 +46,7 @@ export function AppShell() {
           onAgendar={openBooking}
           clearSelectionSignal={selectionResetToken}
         />
-        <div
-          className={`panel ${activeTabId === "detalhes" ? "active" : ""}`}
-          id="panel-detalhes"
-          role="tabpanel"
-          aria-labelledby="tab-detalhes"
-        >
-          <p className="empty-state">Painel &ldquo;Detalhes&rdquo; — em construção.</p>
-          <button className="staff-demo-link" type="button" onClick={() => setStaffOpen(true)}>
-            🔒 Área do barbeiro (demonstração)
-          </button>
-        </div>
+        <DetalhesPanel active={activeTabId === "detalhes"} onOpenStaffDemo={() => setStaffOpen(true)} />
         <ProfissionaisPanel active={activeTabId === "profissionais"} />
         <AvaliacoesPanel active={activeTabId === "avaliacoes"} />
         <FidelidadePanel active={activeTabId === "fidelidade"} />
