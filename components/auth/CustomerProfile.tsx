@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { PREFERENCE_OPTIONS } from "@/data/constants";
 import { money } from "@/lib/formatCurrency";
 import { fmtShortDate } from "@/lib/formatDate";
@@ -28,7 +29,14 @@ export function CustomerProfile({ user, onTogglePreference }: CustomerProfilePro
   return (
     <>
       <div className="profile-head">
-        <img src={user.photo} alt="" className="profile-photo" />
+        <Image
+          src={user.photo}
+          alt=""
+          width={64}
+          height={64}
+          placeholder="empty"
+          className="profile-photo"
+        />
         <div>
           <div className="profile-name">{user.name}</div>
           <div className="profile-sub">{user.phone || `Login via ${METHOD_LABELS[user.method] ?? user.method}`}</div>

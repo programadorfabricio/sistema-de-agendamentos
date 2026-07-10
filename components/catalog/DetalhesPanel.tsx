@@ -1,17 +1,55 @@
+import Image from "next/image";
+
 type DetalhesPanelProps = {
   active: boolean;
   onOpenStaffDemo: () => void;
 };
+
+// URLs conhecidas em build time -> blurDataURL gerado estaticamente (ver historico do PR).
+// Fotos reais de barbearia (Unsplash), substituindo os placeholders do picsum.photos.
+const GALLERY_PHOTOS = [
+  {
+    src: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80",
+    alt: "Ferramentas e produtos de barbearia sobre a bancada",
+    blurDataURL:
+      "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAFAAgDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAX/xAAdEAACAQQDAAAAAAAAAAAAAAAAARECAwQSISKh/8QAFAEBAAAAAAAAAAAAAAAAAAAAA//EABURAQEAAAAAAAAAAAAAAAAAAAAB/9oADAMBAAIRAxEAPwCLk29K+H2STmPAAFSx/9k=",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1702865262133-c10351acc1ca?w=800&q=80",
+    alt: "Cadeira de barbearia em couro",
+    blurDataURL:
+      "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAMAAgDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAMG/8QAHRABAAICAgMAAAAAAAAAAAAAAQIDACEEEhFBof/EABQBAQAAAAAAAAAAAAAAAAAAAAL/xAAVEQEBAAAAAAAAAAAAAAAAAAAAEf/aAAwDAQACEQMRAD8Azz0aISLZxnBSKOjfr7jIHKesa2mlPAbjvGCnH//Z",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800&q=80",
+    alt: "Cadeira de barbearia junto à parede de tijolos",
+    blurDataURL:
+      "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAFAAgDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAX/xAAbEAADAAIDAAAAAAAAAAAAAAAAAQIDERIhgf/EABQBAQAAAAAAAAAAAAAAAAAAAAP/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCPePGoVKJ7XL3egAEZ/9k=",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1635273051937-a0ddef9573b6?w=800&q=80",
+    alt: "Barbeiro aparando o cabelo do cliente",
+    blurDataURL:
+      "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAMAAgDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAME/8QAHRAAAgIDAAMAAAAAAAAAAAAAAQIEEQADIRJxkf/EABQBAQAAAAAAAAAAAAAAAAAAAAL/xAAXEQADAQAAAAAAAAAAAAAAAAAAAQJB/9oADAMBAAIRAxEAPwCCa5UXRHDBz59bWT0+sZjgSXkqqbKrUlKRdm6Bv5jA5HNpYf/Z",
+  },
+];
 
 export function DetalhesPanel({ active, onOpenStaffDemo }: DetalhesPanelProps) {
   return (
     <div className={`panel ${active ? "active" : ""}`} id="panel-detalhes" role="tabpanel" aria-labelledby="tab-detalhes">
       <div className="cat-label">Fotos do espaço</div>
       <div className="gallery-scroller">
-        <img src="https://picsum.photos/seed/barbershop-chairs/300/300" alt="Cadeiras e balcão da barbearia" loading="lazy" />
-        <img src="https://picsum.photos/seed/barbershop-tools/300/300" alt="Ferramentas de corte e navalhas" loading="lazy" />
-        <img src="https://picsum.photos/seed/barbershop-front/300/300" alt="Fachada da barbearia" loading="lazy" />
-        <img src="https://picsum.photos/seed/barbershop-wait/300/300" alt="Área de espera" loading="lazy" />
+        {GALLERY_PHOTOS.map((photo) => (
+          <Image
+            key={photo.src}
+            src={photo.src}
+            alt={photo.alt}
+            width={120}
+            height={90}
+            placeholder="blur"
+            blurDataURL={photo.blurDataURL}
+          />
+        ))}
       </div>
 
       <div className="cat-label">Localização</div>

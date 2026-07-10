@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { StarRating } from "./StarRating";
 import { initials } from "@/lib/text";
 import type { Review } from "@/types/review";
@@ -22,8 +23,16 @@ export function ReviewCard({ review }: ReviewCardProps) {
       <p className="review-text">{review.text}</p>
       {review.photos.length ? (
         <div className="review-photos">
-          {review.photos.map((p, i) => (
-            <img src={p} alt="Foto do corte" key={i} />
+          {review.photos.map((photo, i) => (
+            <Image
+              key={i}
+              src={photo.src}
+              alt="Foto do corte"
+              width={64}
+              height={64}
+              placeholder="blur"
+              blurDataURL={photo.blurDataURL}
+            />
           ))}
         </div>
       ) : null}
