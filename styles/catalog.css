@@ -85,7 +85,7 @@ main.panels{ flex:1; overflow-y:auto; }
 .svc-duration{ color:var(--ivory-dim); display:flex; align-items:center; gap:4px; }
 .svc-agendar{
   flex-shrink:0; align-self:center;
-  background:var(--ivory); color:#1A150D; border:none; border-radius:var(--radius);
+  background:var(--ivory); color:var(--bg); border:none; border-radius:var(--radius);
   font-size:0.8rem; font-weight:700; padding:9px 16px;
 }
 .empty-state{ text-align:center; padding:40px 10px; color:var(--ivory-dim); font-size:0.88rem; }
