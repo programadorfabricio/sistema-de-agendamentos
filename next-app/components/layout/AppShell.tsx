@@ -6,6 +6,7 @@ import { Tabs, type TabItem } from "./Tabs";
 import { ServicosPanel } from "@/components/catalog/ServicosPanel";
 import { BookingSheet } from "@/components/booking/BookingSheet";
 import { LoginSheet } from "@/components/auth/LoginSheet";
+import { StaffSheet } from "@/components/staff/StaffSheet";
 import { useAuth } from "@/contexts/AuthContext";
 import type { BookableService } from "@/types/service";
 
@@ -25,6 +26,7 @@ export function AppShell() {
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectionResetToken, setSelectionResetToken] = useState(0);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [staffOpen, setStaffOpen] = useState(false);
   const auth = useAuth();
 
   function openBooking(service: BookableService) {
@@ -51,6 +53,11 @@ export function AppShell() {
             aria-labelledby={`tab-${tab.id}`}
           >
             <p className="empty-state">Painel &ldquo;{tab.label}&rdquo; — em construção.</p>
+            {tab.id === "detalhes" ? (
+              <button className="staff-demo-link" type="button" onClick={() => setStaffOpen(true)}>
+                🔒 Área do barbeiro (demonstração)
+              </button>
+            ) : null}
           </div>
         ))}
       </main>
@@ -63,6 +70,7 @@ export function AppShell() {
         prefillPhone={auth.user.loggedIn ? auth.user.phone : ""}
       />
       <LoginSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <StaffSheet open={staffOpen} onClose={() => setStaffOpen(false)} />
     </div>
   );
 }
