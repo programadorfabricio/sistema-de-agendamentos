@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { BARBERS } from "@/data/barbers";
 
 type ProfissionaisPanelProps = {
@@ -14,7 +15,7 @@ export function ProfissionaisPanel({ active }: ProfissionaisPanelProps) {
     >
       {BARBERS.map((b) => (
         <div className="pro-row" key={b.id}>
-          <img src={b.photo} alt="" />
+          <Image src={b.photo} alt="" width={52} height={52} placeholder="blur" blurDataURL={b.photoBlurDataURL} />
           <div>
             <div className="name">{b.name}</div>
             <div className="role">{b.role}</div>

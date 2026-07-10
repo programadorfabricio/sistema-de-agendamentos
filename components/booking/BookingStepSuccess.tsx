@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { formatDate } from "@/lib/formatDate";
 import type { Barber } from "@/types/barber";
 import type { BookableService } from "@/types/service";
@@ -20,7 +21,8 @@ export function BookingStepSuccess({ service, barber, date, time, whatsappLink }
       <p>Confirme seu agendamento no WhatsApp para garantir o horário.</p>
       <div className="summary-card">
         <div className="row">
-          <img src={barber.photo} alt="" />
+          {/* 34x34 - abaixo do minimo de 40x40 que o next/image recomenda pra blur valer a pena */}
+          <Image src={barber.photo} alt="" width={34} height={34} />
           <span>{barber.name}</span>
         </div>
         <div className="row">

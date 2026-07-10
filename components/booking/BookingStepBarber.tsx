@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { money } from "@/lib/formatCurrency";
 import type { Barber } from "@/types/barber";
 import type { BookableService } from "@/types/service";
@@ -28,7 +29,7 @@ export function BookingStepBarber({ service, barbers, selectedIdx, onSelect }: B
             className={`barber-select-row ${selectedIdx === idx ? "selected" : ""}`}
             onClick={() => onSelect(idx)}
           >
-            <img src={b.photo} alt="" />
+            <Image src={b.photo} alt="" width={48} height={48} placeholder="blur" blurDataURL={b.photoBlurDataURL} />
             <div>
               <div className="name">{b.name}</div>
               <div className="role">{b.role}</div>
