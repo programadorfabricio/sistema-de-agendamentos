@@ -11,7 +11,9 @@ export const metadata: Metadata = {
 // Mantenha a chave "navalha-theme" e a lógica de fallback em sincronia com
 // getPreferredTheme() em contexts/ThemeContext.tsx — os dois lêem a mesma fonte
 // para o React não hidratar com um tema diferente do que este script já aplicou.
-const THEME_INIT_SCRIPT = `(function(){try{var s=localStorage.getItem("navalha-theme");var t=(s==="light"||s==="dark")?s:(window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`;
+// Sem preferência salva, o fallback é sempre "dark" — de propósito, não segue o
+// prefers-color-scheme do sistema.
+const THEME_INIT_SCRIPT = `(function(){try{var s=localStorage.getItem("navalha-theme");var t=(s==="light"||s==="dark")?s:"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`;
 
 export default function RootLayout({
   children,
