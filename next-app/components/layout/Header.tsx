@@ -1,4 +1,5 @@
 import { ThemeToggleButton } from "./ThemeToggleButton";
+import { ShareButton } from "./ShareButton";
 import { ProfileButton } from "./ProfileButton";
 
 type HeaderProps = {
@@ -21,9 +22,7 @@ export function Header({ onProfileClick }: HeaderProps) {
           </button>
           <div className="icon-btn-group">
             <ThemeToggleButton />
-            <button className="icon-btn" aria-label="Compartilhar barbearia">
-              📤
-            </button>
+            <ShareButton />
             <ProfileButton onClick={onProfileClick} />
             <button className="icon-btn" aria-label="Notificações">
               🔔
