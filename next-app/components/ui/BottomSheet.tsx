@@ -37,11 +37,13 @@ type BottomSheetProps = {
   onClose: () => void;
   title: string;
   subtitle?: string;
+  /** 0-100. Quando definido, mostra a barra de progresso do wizard entre o header e o corpo. */
+  progress?: number;
   footer?: ReactNode;
   children: ReactNode;
 };
 
-export function BottomSheet({ open, onClose, title, subtitle, footer, children }: BottomSheetProps) {
+export function BottomSheet({ open, onClose, title, subtitle, progress, footer, children }: BottomSheetProps) {
   const shouldRender = useDelayedUnmount(open, EXIT_DURATION_MS);
   const overlayRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
@@ -76,6 +78,11 @@ export function BottomSheet({ open, onClose, title, subtitle, footer, children }
             ✕
           </button>
         </div>
+        {progress !== undefined ? (
+          <div className="sheet-progress">
+            <div className="sheet-progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+        ) : null}
         <div className="sheet-body">{children}</div>
         {footer ? <div className="sheet-foot">{footer}</div> : null}
       </div>
