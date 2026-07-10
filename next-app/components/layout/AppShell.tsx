@@ -5,6 +5,8 @@ import { Header } from "./Header";
 import { Tabs, type TabItem } from "./Tabs";
 import { ServicosPanel } from "@/components/catalog/ServicosPanel";
 import { BookingSheet } from "@/components/booking/BookingSheet";
+import { LoginSheet } from "@/components/auth/LoginSheet";
+import { useAuth } from "@/contexts/AuthContext";
 import type { BookableService } from "@/types/service";
 
 const TABS: TabItem[] = [
@@ -22,6 +24,8 @@ export function AppShell() {
   const [bookingService, setBookingService] = useState<BookableService | null>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectionResetToken, setSelectionResetToken] = useState(0);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const auth = useAuth();
 
   function openBooking(service: BookableService) {
     setBookingService(service);
@@ -30,7 +34,7 @@ export function AppShell() {
 
   return (
     <div className="app-shell">
-      <Header />
+      <Header onProfileClick={() => setLoginOpen(true)} />
       <Tabs tabs={TABS} activeId={activeTabId} onChange={setActiveTabId} />
       <main className="panels" id="panels">
         <ServicosPanel
@@ -55,7 +59,10 @@ export function AppShell() {
         open={bookingOpen}
         onClose={() => setBookingOpen(false)}
         onBookingConfirmed={() => setSelectionResetToken((n) => n + 1)}
+        prefillName={auth.user.loggedIn ? auth.user.name : ""}
+        prefillPhone={auth.user.loggedIn ? auth.user.phone : ""}
       />
+      <LoginSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
     </div>
   );
 }

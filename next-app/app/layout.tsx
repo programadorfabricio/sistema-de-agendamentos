@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -31,7 +32,9 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <FavoritesProvider>{children}</FavoritesProvider>
+          <FavoritesProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </FavoritesProvider>
         </ThemeProvider>
       </body>
     </html>
