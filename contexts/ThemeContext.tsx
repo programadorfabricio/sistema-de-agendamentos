@@ -20,9 +20,11 @@ function getPreferredTheme(): Theme {
     const saved = localStorage.getItem(THEME_STORAGE_KEY);
     if (saved === "light" || saved === "dark") return saved;
   } catch {
-    // localStorage indisponível (modo privado etc.) — segue para o fallback de sistema
+    // localStorage indisponível (modo privado etc.) — cai no fallback fixo abaixo
   }
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  // Sem preferência salva, o fallback e sempre "dark" — de proposito, nao segue o
+  // prefers-color-scheme do sistema (decisao de produto, nao limitacao tecnica).
+  return "dark";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
