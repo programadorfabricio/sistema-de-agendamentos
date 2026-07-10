@@ -7,6 +7,9 @@ import { ServicosPanel } from "@/components/catalog/ServicosPanel";
 import { BookingSheet } from "@/components/booking/BookingSheet";
 import { LoginSheet } from "@/components/auth/LoginSheet";
 import { StaffSheet } from "@/components/staff/StaffSheet";
+import { ProfissionaisPanel } from "@/components/professionals/ProfissionaisPanel";
+import { AvaliacoesPanel } from "@/components/reviews/AvaliacoesPanel";
+import { FidelidadePanel } from "@/components/loyalty/FidelidadePanel";
 import { useAuth } from "@/contexts/AuthContext";
 import type { BookableService } from "@/types/service";
 
@@ -17,8 +20,6 @@ const TABS: TabItem[] = [
   { id: "avaliacoes", label: "Avaliações" },
   { id: "fidelidade", label: "Fidelidade" },
 ];
-
-const PLACEHOLDER_TABS = TABS.filter((tab) => tab.id !== "servicos");
 
 export function AppShell() {
   const [activeTabId, setActiveTabId] = useState<string>(TABS[0].id);
@@ -44,22 +45,20 @@ export function AppShell() {
           onAgendar={openBooking}
           clearSelectionSignal={selectionResetToken}
         />
-        {PLACEHOLDER_TABS.map((tab) => (
-          <div
-            key={tab.id}
-            className={`panel ${tab.id === activeTabId ? "active" : ""}`}
-            id={`panel-${tab.id}`}
-            role="tabpanel"
-            aria-labelledby={`tab-${tab.id}`}
-          >
-            <p className="empty-state">Painel &ldquo;{tab.label}&rdquo; — em construção.</p>
-            {tab.id === "detalhes" ? (
-              <button className="staff-demo-link" type="button" onClick={() => setStaffOpen(true)}>
-                🔒 Área do barbeiro (demonstração)
-              </button>
-            ) : null}
-          </div>
-        ))}
+        <div
+          className={`panel ${activeTabId === "detalhes" ? "active" : ""}`}
+          id="panel-detalhes"
+          role="tabpanel"
+          aria-labelledby="tab-detalhes"
+        >
+          <p className="empty-state">Painel &ldquo;Detalhes&rdquo; — em construção.</p>
+          <button className="staff-demo-link" type="button" onClick={() => setStaffOpen(true)}>
+            🔒 Área do barbeiro (demonstração)
+          </button>
+        </div>
+        <ProfissionaisPanel active={activeTabId === "profissionais"} />
+        <AvaliacoesPanel active={activeTabId === "avaliacoes"} />
+        <FidelidadePanel active={activeTabId === "fidelidade"} />
       </main>
       <BookingSheet
         service={bookingService}
