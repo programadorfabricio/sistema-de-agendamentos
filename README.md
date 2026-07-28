@@ -2,6 +2,20 @@
 
 Plataforma completa de agendamento para barbearias com integração WhatsApp.
 
+## 📸 Screenshots
+
+### Página Inicial & Serviços
+![Página Inicial](./Captura%20de%20tela%202026-07-28%20161853.png)
+
+### Calendário de Agendamento
+![Calendário](./Captura%20de%20tela%202026-07-28%20161919.png)
+
+### Dashboard do Barbeiro
+![Dashboard](./Captura%20de%20tela%202026-07-28%20161944.png)
+
+### Detalhes & Localização
+![Detalhes](./Captura%20de%20tela%202026-07-28%20162000.png)
+
 ## 🎯 Features
 - ✅ Agendamento online (calendário interativo)
 - ✅ Notificações automáticas via WhatsApp
